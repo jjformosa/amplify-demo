@@ -1,3 +1,6 @@
+## What is this
+這是一個技術棧、Infra、費用都寄生在AWS這個IP的個人履歷展示專案，額外加了些雜七雜八的東西，可以稱之為臺灣中小型軟體公司，特別是接專案型的公司的縮影吧。
+
 ## AWS Amplify React+Vite Starter Template
 
 This repository provides a starter template for creating applications using React+Vite and AWS Amplify, emphasizing easy setup for authentication, API, and database capabilities.
