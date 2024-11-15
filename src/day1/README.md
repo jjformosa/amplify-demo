@@ -49,9 +49,11 @@ AWS Amplify的部分先姑且放下，這個專案是基於[Amplify React Templa
 但在container順利執行腳本後，也看到log中那令人振奮的畫面了
 
 ![Vite 執行成功](md_resources/p1.png?raw=true)
+
 可是瀏覽器卻有可能連接不上，只有令人心碎的畫面
 
 ![心碎畫面流出](md_resources/p2.png?raw=true)
+
 這是因為，在Container中的Node環境，就只接受一樣來自它的localhost來源請求，而開發機上的瀏覽器相較於Container是**另一台機器**，這是我在工作上常遇到同事剛開始接觸Docker的時候相對常見的問題，包括
 - 在開發機上，執行指令後可以透過localhost打開網頁，用了Docker就不行
 - 在Docekr中的程式碼連不到另一個Docker，或者開發機上的資料庫
