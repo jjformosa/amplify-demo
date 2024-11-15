@@ -47,19 +47,22 @@ AWS Amplify的部分先姑且放下，這個專案是基於[Amplify React Templa
 }
 ```
 但在container順利執行腳本後，也看到log中那令人振奮的畫面了
+
 ![Vite 執行成功](md_resources/p1.png?raw=true)
 可是瀏覽器卻有可能連接不上，只有令人心碎的畫面
-![心碎畫面流出](md_resources/p1.png?raw=true)
+
+![心碎畫面流出](md_resources/p2.png?raw=true)
 這是因為，在Container中的Node環境，就只接受一樣來自它的localhost來源請求，而開發機上的瀏覽器相較於Container是**另一台機器**，這是我在工作上常遇到同事剛開始接觸Docker的時候相對常見的問題，包括
 - 在開發機上，執行指令後可以透過localhost打開網頁，用了Docker就不行
 - 在Docekr中的程式碼連不到另一個Docker，或者開發機上的資料庫
 - 總之就是各種連線失敗
 這一類問題，其實Google或者透過ChatGPT，都有人/AI說明得很清楚了，就不在這邊野人獻曝，總之現在需要把專案中的腳本調整一下，從 *\"dev\":\"vite\"* 改為 *\"dev\":\"vite --host 0.0.0.0\"* ，然後把前次操作生成的Container刪掉，重新執行 *dockerscripts/rundev.sh*，這下瀏覽器就有收到回應啦!!
-![但是依然令人心碎](md_resources/p3.png)
+
+![但是依然令人心碎](md_resources/p3.png?raw=true)
 
 ## just another day in life of dev 
 來自客戶、或者主管、同事，有時候是KOL，有時候大公司們一句右一句動聽的話語，變成開發者一個又一個要克服的困難，然而我覺得整合這些，則是「開發」在IT行業獨特的地位的原因之一，而且近年的開發者，在自己的機器上就可以體驗、排除過整合環境的困難，其實就職涯來說我並不覺得全然是個壞事。
-另一方面，興奮起來吧！從錯誤中我們可以看到是因為少了一個*amplify_outputs.json*檔，這是其中一個選擇AWS Amplify的原因，作為一個相對老的開發者，這個檔案讓我們聯想到的是像firebase message，或者諸如此類服務需要下載，並且放到專案中的檔案，不論是網站、Android或者iOS都需要它，但，回到(AWS文件)[https://docs.amplify.aws/react/start/quickstart/#4-set-up-local-environment]，這個json檔的來源，跟開發者透過整個AWS Amplify維護後端服務有關，也就是說有那麼一個機會，透過這個檔案與Amplify跨平台的SDK，可以讓Amplify支援的每個平台，包括React(含Next)、Vue、Angular、Flutter、Android與iOS(Swift)，都可以使用同一份文件，實現功能的串接。
+另一方面，興奮起來吧！從錯誤中我們可以看到是因為少了一個*amplify_outputs.json*檔，這是其中一個選擇AWS Amplify的原因，作為一個相對老的開發者，這個檔案讓我們聯想到的是像firebase message，或者諸如此類服務需要下載，並且放到專案中的檔案，不論是網站、Android或者iOS都需要它，但，回到[AWS文件](https://docs.amplify.aws/react/start/quickstart/#4-set-up-local-environment)，這個json檔的來源，跟開發者透過整個AWS Amplify維護後端服務有關，也就是說有那麼一個機會，透過這個檔案與Amplify跨平台的SDK，可以讓Amplify支援的每個平台，包括React(含Next)、Vue、Angular、Flutter、Android與iOS(Swift)，都可以使用同一份文件，實現功能的串接。
 但遺憾的是有個大前提， **後端目前只有Node**。雖然對於我這類支持前後端一個語言的開發者來說，這是一份獎勵就是了。總而言之，依照文件的提醒，我們需要先部署Amplify，取得amplify_outputs.json檔案，才能讓網站順利跑起來。請特別注意，透過CI/CD開始需要費用，以及AWS帳號、專案，也需要版控平台，基本上還要AWS CLI跟AWS SDK，這些基本要求都不在這邊提了，下一張圖就是完成以上工作後的結果。
 
 
