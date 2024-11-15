@@ -63,8 +63,32 @@ AWS Amplify的部分先姑且放下，這個專案是基於[Amplify React Templa
 ## just another day in life of dev 
 來自客戶、或者主管、同事，有時候是KOL，有時候大公司們一句右一句動聽的話語，變成開發者一個又一個要克服的困難，然而我覺得整合這些，則是「開發」在IT行業獨特的地位的原因之一，而且近年的開發者，在自己的機器上就可以體驗、排除過整合環境的困難，其實就職涯來說我並不覺得全然是個壞事。
 另一方面，興奮起來吧！從錯誤中我們可以看到是因為少了一個*amplify_outputs.json*檔，這是其中一個選擇AWS Amplify的原因，作為一個相對老的開發者，這個檔案讓我們聯想到的是像firebase message，或者諸如此類服務需要下載，並且放到專案中的檔案，不論是網站、Android或者iOS都需要它，但，回到[AWS文件](https://docs.amplify.aws/react/start/quickstart/#4-set-up-local-environment)，這個json檔的來源，跟開發者透過整個AWS Amplify維護後端服務有關，也就是說有那麼一個機會，透過這個檔案與Amplify跨平台的SDK，可以讓Amplify支援的每個平台，包括React(含Next)、Vue、Angular、Flutter、Android與iOS(Swift)，都可以使用同一份文件，實現功能的串接。
-但遺憾的是有個大前提， **後端目前只有Node**。雖然對於我這類支持前後端一個語言的開發者來說，這是一份獎勵就是了。總而言之，依照文件的提醒，我們需要先部署Amplify，取得amplify_outputs.json檔案，才能讓網站順利跑起來。請特別注意，透過CI/CD開始需要費用，以及AWS帳號、專案，也需要版控平台，基本上還要AWS CLI跟AWS SDK，這些基本要求都不在這邊提了，下一張圖就是完成以上工作後的結果。
+但遺憾的是有個大前提， **後端目前只有Node**。雖然對於我這類支持前後端一個語言的開發者來說，這是一份獎勵就是了。總而言之，依照文件的提醒，我們需要先部署Amplify，取得amplify_outputs.json檔案，才能讓網站順利跑起來。請特別注意，透過CI/CD開始需要費用，以及AWS帳號、專案，也需要版控平台，基本上還要AWS CLI跟AWS SDK，這些基本要求都不在這邊提了，下載json檔案的過程蠻迷幻的，附上gif
 
+![下載amplify_output.sjon](md_resources/4.gif)
+
+這個流程有點讓人不爽的地方就是，想要先看到前端，反而要先做一次部署。但實際上，[閱讀Amplify文件有一章就是在提醒應該前端歸前端，後端歸Amplify](https://docs.amplify.aws/react/deploy-and-host/fullstack-branching/mono-and-multi-repos/)，這樣還有一個好處，上面不是有提到，照理說有了*amplify_outputs.json*和該語言的*amplify SDK*，應該要讓每一位開發者都可以使用同一份lib嗎，也就是說，如果不像我偷懶懶把網頁前端也放進同一個Amplify專案，實際流程應該是用AWS Amplify去部署後端=>得到amplify_output.json，交給前端同事們(or自己......)，但後端專案本身就有前端也有一個好處，就是後端人員可以簡單操作、測試，甚至可以用來打造簡單的腳本和後台維護資料。
+另外這裡有個小坑，你會發現首次Build的過程，還沒有下載json檔案，但是amplify依然可以build出前端，加上官方的範例中也把*amplify_outpus\**列在gitignore清單中，所以如果你換了電腦或專案資料夾、同事首次pull專案，都得手動把json弄過去一次，所以確實會建議前後端分開維護。
+
+## before continue...
+至此，有必要先列一下AWS Amplify/AWS full stack的優劣勢、個人對他的期待與失望
+優點
+- 便宜的CI/CD方案，Amplify每次更新、建置、部署，每分鐘只收0.01美元
+- 直接使用AWS SDK控管資料，因為Amplify Client SDK幾乎都要配合authorization機制，使得資料存取權相對安全
+- 宣告式的方法定義資源，不用很熟悉NodeJS和AWS提供的各種服務，就可以建立出蠻完整的系統
+- 前面說到的減少Client多平台的問題
+- 幾乎所有預設的服務都是隨需支付，而且天生有AWS各項服務保證的SLA、基本的資安保障
+- Amplify 只是幫忙整合、部署AWS基礎設施如DyanmoDB、Lambda、Cognito、s3......等等，用你熟悉的方式如AWS Console、CLI來維護資料，也可以把存在的資源再整合進Amplify專案，換句話說，我們有最終而且熟悉的手段去維護這個看起來像盲盒的東西
+
+缺點
+- 需要客製化功能的時候，還是要閱讀AWS那難以閱讀的文件，而且Amplify官方案例也不多，不是本來就熟悉AWS的人員可能完全不知從何處理bug或開發
+- NodeJS，雖然對我是獎勵
+- Amplify會擅自開很多服務、定義很多角色，團隊的主管、Ops或資安部門潔癖發作的時候，很難針對權限收拾
+- 呈上，實際用在營運的話，很有可能有意料之外的費用
+
+個人最大的期望與失望
+1. 雖然一直提到讓前端共用sdk，但實際上我還沒有機會測試瀏覽器端以外的環境，在接下來的章節，讀者應該也會體會到為什麼對這個說法有疑慮
+2. AWS有推出協助工程師的AI工具[AWS Q Developer](https://docs.amplify.aws/react/build-a-backend/q-developer/)，找到這個工具的時候我非常振奮，以為他可以節省難以下嚥的AWS文件的時間，然而它針對Amplify，甚至AWS SDK的準確度頗令人髮指，倒是在猜測工程師的意圖、提供建議這個部分表現得令我蠻驚訝的，也許接下來有機會，會跟眼下更流行的Cursor做比較。
 
 ## TODO
 ### 延伸閱讀
