@@ -95,7 +95,7 @@ AWS Amplify的部分先姑且放下，這個專案是基於[Amplify React Templa
 個人最大的期望與失望
 1. 雖然一直提到讓前端共用plugin，但實際上我還沒有機會測試瀏覽器端以外的環境，在接下來的章節，讀者應該也會體會到為什麼對這個說法有疑慮
 2. AWS有推出協助工程師的AI工具[AWS Q Developer](https://docs.amplify.aws/react/build-a-backend/q-developer/)，找到這個工具的時候我非常振奮，以為他可以節省難以下嚥的AWS文件的時間，然而它針對Amplify，甚至AWS SDK的準確度頗令人髮指，倒是在猜測工程師的意圖、提供建議這個部分表現得令我蠻驚訝的，也許接下來有機會，會跟眼下更流行的Cursor做比較。
+3. 以及下一章會提到的，Cognito的整合social login，是整人的整
 
-## TODO
 ### 延伸閱讀
-關於開發機器上，環境落後的案例
+關於開發機器上，無法重現開發/建置環境的案例
