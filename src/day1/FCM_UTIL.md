@@ -55,9 +55,11 @@ Running "docker run --rm -v /Users/cheyuanliu/Library/Caches/serverless-python-r
 而動用其他語言，我很驚訝地發現不是每個後端，或者server-client模式的開發者，都習慣於處理不一樣的http接口，而偏偏Serverless作為一種雲平台內部泛用的規格，都不是常見的request、response，而是直接處理Context的風格
 
 一般的Web框架會封裝明確的Request和Response，以及方便的路由或者入口點
+
 [!flaskEntryPoint](md_resources/p9.png)
 
 Lambda作為一個可接各種Schema的FaaS，開發者需要直接面對文本(Context)
+
 [!Lambda](md_resources/p10.png)
 
 而那個時候，應該是Lambda官方也有建議以Serverless Framework作為解決方案，不擅長使用腳本、AWS CLI等工具的我也就選擇了它來代理工作，因為除了前述解決我不擅長使用腳本工具以外，**sls framework在過程中，也會幫忙轉譯context=>request, response**這一段，讓開發者可以保持自己習慣的Web Server Framework開發，實際上，現在我回頭看這個路線也是正確的，畢竟現在有太多輪子在他們的生態系活躍，不需要開發者去重造，這些案例往後的文章(記得的話)都會提到[^1]。
