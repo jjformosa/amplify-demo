@@ -98,4 +98,4 @@ AWS Amplify的部分先姑且放下，這個專案是基於[Amplify React Templa
 3. 以及下一章會提到的，Cognito的整合social login，是整人的整
 
 ### 延伸閱讀
-關於開發機器上，無法重現開發/建置環境的案例
+[關於開發機器上，無法重現開發/建置環境的案例](./FCM_UTIL.md)
