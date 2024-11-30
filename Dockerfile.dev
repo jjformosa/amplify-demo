@@ -1,0 +1,10 @@
+# 本檔案適用於「重建開發環境」，aka first pull from git，重建時執行dockerscripts/rebuilddev.sh
+# 指定開發環境
+FROM --platform=amd64 node:22.3-alpine
+# 指定預設工作目錄，因此要記得在執行Docker Run要採對應的mount或者COPY
+WORKDIR /app
+COPY . .
+EXPOSE 5173
+
+ENTRYPOINT [ "sh" ]
+# CMD ["dockerscripts/dev-install.sh"]
