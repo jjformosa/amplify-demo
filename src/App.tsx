@@ -8,9 +8,9 @@ function App() {
   return (
     <main>
       <LiffProvider liffId='2004822790-ndEy8LlX'>
-        {/* <AmplifyAuthProvider> */}
+        <AmplifyAuthProvider>
           <RouterProvider router={router} />
-        {/* </AmplifyAuthProvider> */}
+        </AmplifyAuthProvider>
       </LiffProvider>
     </main>
   );
