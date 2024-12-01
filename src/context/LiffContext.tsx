@@ -115,7 +115,6 @@ export const LiffProvider: React.FC<LiffCongigure> = ({ children, liffId }) => {
     const update = async () => {
       if (!liff) return
       if (liff.isLoggedIn()) {
-        console.log('aaa')
         const accessToken = await liff.getAccessToken()
         const idToken = liff.getIDToken()
         const idTokenPayload = await liff.getDecodedIDToken()

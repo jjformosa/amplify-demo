@@ -164,7 +164,7 @@ export const doLoginWithLiff = async (accesstoken: string, idToken: string):Prom
     // const email = process.env.stage === 'prod' ? (payload.email ?? 'email error') : 'jjformosa1220+2@gmail.com'
     const email = payload.email ?? 'email error'
     const username = email
-    const clientMetadata = { identitySource : 'liff' }
+    const clientMetadata = { identitySource : 'liff' } // 這算是重點，寄望這個參數之後可以支援其他socail login的擴充
     const signInInput: SignInInput = {
       username,
       options: {

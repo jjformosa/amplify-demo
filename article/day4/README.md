@@ -118,3 +118,19 @@ async function handleCustomUILogin() {
 // src/pages/Login.tsx
 // 引用[hook]userLiff、useAmplifyAuth，設計UI觸發liff.login
 ```
+
+## Amplify Sandbox
+但是，就像前面幾天的章節有說到的，其實在Amplify前端跟後端放在一個專案的時候，很常有資源相依性的問題，再者每次更新都需要送新的git commit，如果只是要更動css也要git push，觸發code build的費用就很浪費。所以這時候就需要先透過Sandbox工具來做地端測試。Amplify的Sandbox意思是......我還沒參透為什麼它用Sandbox這個名詞，但總之依照官方的文件下了*npx ampx sandbox*後，將會得到一群完全獨立的Amplify服務，其實看上去蠻可怕的，畢竟費用就是*2(省code build而已)，而且它仍然有相依性問題，常發生移除後Sandbox建立的資源沒辦法順利移除的問題。所以我個人也沒有很推薦使用，還是建議乖乖地前端歸前端開發，後端再透過版控=>code build=>amplify更新。
+
+## just another day in life of dev
+![liff登入後，會看到錯誤，並且被轉址到Cognito的登入畫面](./resources/p2.gif)
+
+但走到這一步，仍然會收到出乎意料的成果，原因是程式碼defineChallenge會檢查信箱是否存在userPool中，而顯然目前的程式碼並沒有替external provider的使用者自動做這件事情。所以下一章~~我才有東西寫~~ ，將會繼續處理註冊的部分，今天到此附上登入有被呼叫的證明--Lambda Trigger--的呼叫紀錄。
+
+Amazon Cognito > 使用者集區 > amplifyAuthUserPoolOO-XX > 延伸功能底下，有Amplify自動部屬的Lambda Trigger
+
+![找到屬於這個Amplify的Cognito資源](./resources/p5.png)
+
+可以看到有呼叫紀錄和錯誤紀錄，明天再繼續處理吧!
+
+![defineChallenge的紀錄](./resources/p6.png)

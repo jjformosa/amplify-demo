@@ -36,6 +36,7 @@ export const Home = () => {
   }, []);
   useEffect(() => {
     if(!$liff.inited) return
+    console.log('aaa')
     if(!$liff.isLoggedIn) {
       $navigate('/login')
     } else {
