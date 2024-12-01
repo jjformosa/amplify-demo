@@ -16,7 +16,6 @@ export const Home = () => {
     const accesstoken = await $liff.doGetAccessToken()
     const idToken = await $liff.getIdToken()
     if(!idToken || !accesstoken) return
-    console.log(19, idToken)
     await $amplifyAuth.doLogin('liff', { accesstoken, idToken })
   }, [$liff.isLoggedIn])
 

@@ -164,6 +164,7 @@ export const doLoginWithLiff = async (accesstoken: string, idToken: string):Prom
     // const email = process.env.stage === 'prod' ? (payload.email ?? 'email error') : 'jjformosa1220+2@gmail.com'
     const email = payload.email ?? 'email error'
     const username = email
+    const clientMetadata = { identitySource : 'liff' }
     const signInInput: SignInInput = {
       username,
       options: {
@@ -172,9 +173,10 @@ export const doLoginWithLiff = async (accesstoken: string, idToken: string):Prom
           email,
           name: payload.name,
           picture: payload.picture,
-          'custom:liffId': payload.sub,
-          'custom:line_access_token': accesstoken
-        }
+          'liffId': payload.sub,
+          'liffAccessToken': accesstoken
+        },
+        clientMetadata
       }
     }
     const { isSignedIn, nextStep } = await signIn(signInInput)
@@ -185,10 +187,7 @@ export const doLoginWithLiff = async (accesstoken: string, idToken: string):Prom
       const confirmSignInOutput = await confirmSignIn({
         challengeResponse: accesstoken,
         options: {
-          clientMetadata: {
-            identitySource: 'liff',
-            email
-          }
+          clientMetadata
         }
       })
       if (confirmSignInOutput.isSignedIn) {
