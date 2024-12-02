@@ -19,6 +19,10 @@ export const auth = defineAuth({
         issuerUrl:'https://access.line.me',
         scopes: ['email', 'profile', 'openid'],
         attributeMapping: {
+            email: 'email',
+            name: 'name',
+            picture: 'picture'
+          },
           custom: {
             liffId: 'liffId',
             liffToken: 'liffAccessToken'
