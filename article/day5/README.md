@@ -9,7 +9,7 @@
 ......
 "scripts": {
     "dev": "vite",
-    "build": "tsc",
+    "build": "tsc & vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   }
@@ -17,8 +17,10 @@
 ```
 可以知道npm run build實際上會執行tsc與vite build兩個部分，所以下一輪push時，把這邊改成只有做tsc，就只會做後端的更新了。
 
-至於前端，在本機下*vite build* 以後，把dist資料夾壓縮起來，開一個新的Amplify應用程式，上傳壓縮檔就搞定了。
+至於前端，寫一個新的腳本，如build:frontend處理vite build，往後在build:frontend結束後把dist資料夾壓縮起來，開一個新的Amplify應用程式，上傳壓縮檔就搞定了。
 > dist就是一包靜態網站而已，也可以將其交給nginx、iis、s3、githubpage......任何你習慣的環境。
+
+> 這其實還是蠻浪費code build的成本，因為tsc實際還是會花時間處理在src的內容，所以真正在用的時候還是建議徹底分開。
 
 ## 處理註冊
 使用Cognito、Amplify的預設介面和流程的時候，新帳戶會自動實現註冊(甚至信箱認證)，但是如果是自己呼叫SignIn API，就要自己處理帳號不存在、註冊(SignUp)等工作了。

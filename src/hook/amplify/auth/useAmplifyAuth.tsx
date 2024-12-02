@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext, useState, useEffect, useCallback } from 'react'
 import { type OIDCService, type AmplifyAuthService, type IdentitySource, AmplifyAuthContext } from '@src/context/amplify/AuthContext'
 
 type LoginState = {
@@ -25,10 +25,10 @@ export const useAmplifyAuth = (): AmplifyAuthService & LoginState => {
     picture: null
   })
   const context = useContext(AmplifyAuthContext)
-  const update = async () => {
+  const update = useCallback(async () => {
     const isLoggedIn = await context.isAuth()
-    const accessToken = await context.doGetAccessToken()
-    const decodedIdToken = await context.getDecodedIdToken()
+    const accessToken = context.auth?.accessToken ?? null
+    const decodedIdToken = context.auth?.idTokenPayload ?? null
     const profile = await context.getProfile()
     setAmplifyState({
       inited: true,
@@ -40,7 +40,7 @@ export const useAmplifyAuth = (): AmplifyAuthService & LoginState => {
       email: decodedIdToken?.email ?? null,
       picture: (decodedIdToken?.picture as string) ?? null
     })
-  }
+  }, [context.auth])
   useEffect(() => {
     update()
   }, [context.accessToken])

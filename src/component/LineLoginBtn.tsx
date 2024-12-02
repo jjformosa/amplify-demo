@@ -9,13 +9,13 @@ export const LineLoginBtn = ({ redirectUri }: LoginInput) => {
     $liff.doLogin(redirectUri ?? window.location.href);
   }
 
-  if($liff.inited && !$liff.isLoggedIn) {
+  if($liff.isLoggedIn) {
+    return (<div>loggedIn!!!!!</div>)
+  } else {
     return (
       <>
           <button onClick={ login }>Login</button>
       </>
     )
-  } else {
-    return (<div>loggedIn!!!!!</div>)
   }
 }

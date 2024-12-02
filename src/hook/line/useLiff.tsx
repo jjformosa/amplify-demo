@@ -37,7 +37,7 @@ export const useLiff = (): OIDCService & LoginState => {
       email: decodedIdToken?.email ?? null,
       picture: (decodedIdToken?.picture as string) ?? null
     })
-  }, [])
+  }, [context.auth])
 
   useEffect(() => {
     updateAuth() // useEffect 不接受async修飾，所以如果一定要的話，乾脆把function用useCallback額外定義
