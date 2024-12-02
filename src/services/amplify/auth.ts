@@ -315,7 +315,7 @@ export const doRegisterByLiff = async (idToken: string, accesstoken: string): Pr
   const signUpParam: SignUpInput = {
     // username: registerParam.clientId,
     username: email,
-    password: '!1qaz@WSX!',
+    password: '!1qaz@WSX!', // 這個密碼只是拿來填API, 實際登入時可以拒絕使用信箱跟密碼、要求使用者改密碼、server重產亂數密碼等方法
     options: {
       autoSignIn: true,
       userAttributes: {

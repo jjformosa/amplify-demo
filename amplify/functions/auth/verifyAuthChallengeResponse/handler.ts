@@ -1,5 +1,4 @@
 import { type VerifyAuthChallengeResponseTriggerHandler } from 'aws-lambda'
-import AWS from 'aws-sdk'
 import { verifyAccessTokenWithLiff } from '../line'
 
 export const handler: VerifyAuthChallengeResponseTriggerHandler = async (event) => {

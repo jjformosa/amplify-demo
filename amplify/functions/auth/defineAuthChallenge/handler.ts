@@ -24,9 +24,26 @@ export const handler: DefineAuthChallengeTriggerHandler = async (event) => {
     // 確認email已經存在於userpool
     const listUsersResponse = await cognitClient.listUsers(filterParams).promise()
     const users = listUsersResponse.Users ?? []
-    if (users.length === 0) { //這段會導致前端收到註冊要求，但Day4還先不處理
-      event.response.issueTokens = false
-      event.response.failAuthentication = true
+    if (users.length === 0) {
+      // event.response.issueTokens = false
+      // event.response.failAuthentication = true
+      const createUserParams = {
+        UserPoolId: event.userPoolId,
+        Username: email,
+        UserAttributes: [
+          {
+            Name: 'email',
+            Value: email
+          }
+        ]
+      }
+      const name = event.request.userAttributes.name
+      const picture = event.request.userAttributes.picture
+      if (name) createUserParams.UserAttributes.push({ Name: 'name', Value: name })
+      if (picture) createUserParams.UserAttributes.push({ Name: 'picture', Value: picture })
+      const createUserResponse = await cognitClient.adminCreateUser(createUserParams).promise()
+      console.log('createUserResponse', createUserResponse)
+      event.response.challengeName = 'CUSTOM_CHALLENGE'
     } else { //這段會觸發UserPool向前端發起挑戰
       event.response.challengeName = 'CUSTOM_CHALLENGE'
     }
