@@ -174,8 +174,8 @@ export const doLoginWithLiff = async (accesstoken: string, idToken: string):Prom
           email,
           name: payload.name,
           picture: payload.picture,
-          'liffId': payload.sub,
-          'liffAccessToken': accesstoken
+          'custom:liffId': payload.sub,
+          'custom:liffAccessToken': accesstoken
         },
         clientMetadata
       }
