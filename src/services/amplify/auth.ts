@@ -167,7 +167,7 @@ export const doLoginWithLiff = async (accesstoken: string, idToken: string):Prom
     if (!name) throw new Error('email is name')
     if (!picture) throw new Error('email is picture')
     const username = email
-    const clientMetadata = { identitySource : 'liff', email, name,  } // 這算是重點，寄望這個參數之後可以支援其他socail login的擴充
+    const clientMetadata = { identitySource : 'liff', email, name } // 這算是重點，寄望這個參數之後可以支援其他socail login的擴充
     const signInInput: SignInInput = {
       username,
       options: {

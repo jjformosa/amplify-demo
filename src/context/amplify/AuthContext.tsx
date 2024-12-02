@@ -77,16 +77,14 @@ export const AmplifyAuthProvider: React.FC<AmplifyAuthCongigure> = ({ children }
       const { accesstoken, idToken } = args as LINE_LOGIN_PARAM
       await AwsAuth.doLoginWithLiff(accesstoken, idToken)
     }
-    await AwsAuth.doLogin()
     setBusy(false)
   }, [inited])
 
   const doLogout = useCallback(async () => {
-    if (!inited) return
-    if (!(await isAuth())) return
+    if (!auth) return
     await AwsAuth.doLogout()
     setAuth(emptyOIDCAuth)
-  }, [inited])
+  }, [auth])
 
   const _registerWithEamil = async (email: string, password: string) => {
     const registerResult = await AwsAuth.doRegisterWithEmailPwd(email, password)

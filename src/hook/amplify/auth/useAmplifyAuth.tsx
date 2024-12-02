@@ -26,7 +26,7 @@ export const useAmplifyAuth = (): AmplifyAuthService & LoginState => {
   })
   const context = useContext(AmplifyAuthContext)
   const update = useCallback(async () => {
-    const isLoggedIn = await context.isAuth()
+    const isLoggedIn = context.auth?.accessToken !== null
     const accessToken = context.auth?.accessToken ?? null
     const decodedIdToken = context.auth?.idTokenPayload ?? null
     const profile = await context.getProfile()

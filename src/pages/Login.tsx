@@ -28,6 +28,9 @@ export const Login = () => {
           .then(([idToken, accesstoken]) => {
             if (!idToken || !accesstoken) throw new Error(`liff error: idToken ${idToken}, accesstoken ${accesstoken}`);
             $amplifyAuth.doLogin('liff', { accesstoken, idToken });
+            // $amplifyAuth.doLogout().then(() => {
+            //   console.log('logout success')
+            // });
         }).catch(e => console.error(e)) // TODO err dialog
       }
     }
