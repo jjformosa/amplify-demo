@@ -19,7 +19,7 @@ export const handler: DefineAuthChallengeTriggerHandler = async (event) => {
     event.response.failAuthentication = !challengeResult
   } else {
     console.log('userAttributes')
-    printEachOfStringMap(event.request.userAttributes)
+    printEachOfStringMap(event.request.userAttributes, 'userAttributes')
     const e = event.request.userAttributes.email
     // 代表本次請求來自某個Amplify Client的首次請求
     const filterParams = {
