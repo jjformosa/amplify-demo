@@ -29,7 +29,7 @@ export const handler: DefineAuthChallengeTriggerHandler = async (event) => {
       // event.response.failAuthentication = true
       const createUserParams = {
         UserPoolId: event.userPoolId,
-        Username: 'test',
+        Username: email,
         UserAttributes: [
           {
             Name: 'email',
