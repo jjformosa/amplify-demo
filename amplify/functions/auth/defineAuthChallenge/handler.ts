@@ -16,8 +16,8 @@ export const handler: DefineAuthChallengeTriggerHandler = async (event) => {
     event.response.issueTokens = challengeResult
     event.response.failAuthentication = !challengeResult
   } else {
-    // console.log('userAttributes')
-    // printEachOfStringMap(event.request.userAttributes)
+    console.log('userAttributes')
+    printEachOfStringMap(event.request.userAttributes)
     // const email = event.request.userAttributes.email
     // 代表本次請求來自某個Amplify Client的首次請求
     const filterParams = {
@@ -41,8 +41,6 @@ export const handler: DefineAuthChallengeTriggerHandler = async (event) => {
           }
         ]
       }
-      const name = event.request.userAttributes.name
-      const picture = event.request.userAttributes.picture
       if (name) createUserParams.UserAttributes.push({ Name: 'name', Value: name })
       if (picture) createUserParams.UserAttributes.push({ Name: 'picture', Value: picture })
       console.log('createUserParams', createUserParams)

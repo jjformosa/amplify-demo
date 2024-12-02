@@ -1,5 +1,6 @@
 import { defineAuth } from '@aws-amplify/backend';
 import { secret } from '@aws-amplify/backend';
+import preAuthentication from '../functions/auth/preAuthentication/resource';
 import defineAuthChallenge from '../functions/auth/defineAuthChallenge/resource';
 import createAuthChallenge from '../functions/auth/createAuthChallenge/resource';
 import verifyAuthChallengeResponse from '../functions/auth/verifyAuthChallengeResponse/resource';
@@ -31,6 +32,7 @@ export const auth = defineAuth({
     }
   }, 
   triggers: {
+    preAuthentication: preAuthentication,
     defineAuthChallenge: defineAuthChallenge,
     createAuthChallenge: createAuthChallenge,
     verifyAuthChallengeResponse: verifyAuthChallengeResponse
