@@ -20,14 +20,11 @@ export const auth = defineAuth({
         scopes: ['email', 'profile', 'openid'],
         attributeMapping: {
             email: 'email',
-            name: 'name',
-            picture: 'picture'
-          },
-          custom: {
-            liffId: 'liffId',
-            liffToken: 'liffAccessToken'
+            custom: {
+              liffId: 'liffId',
+              liffToken: 'liffAccessToken'
+            }
           }
-        } 
       }],
       callbackUrls: ['https://localhost:5173'],
       logoutUrls:['https://localhost:5173']
