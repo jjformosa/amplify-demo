@@ -1,5 +1,6 @@
 import { type DefineAuthChallengeTriggerHandler } from 'aws-lambda'
 import AWS from 'aws-sdk'
+import { printEachOfStringMap } from '../utils'
 
 const cognitClient = new AWS.CognitoIdentityServiceProvider()
 
@@ -14,6 +15,7 @@ export const handler: DefineAuthChallengeTriggerHandler = async (event) => {
     event.response.issueTokens = challengeResult
     event.response.failAuthentication = !challengeResult
   } else {
+    printEachOfStringMap(event.request.userAttributes)
     const email = event.request.userAttributes.email
     // 代表本次請求來自某個Amplify Client的首次請求
     const filterParams = {

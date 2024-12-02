@@ -161,6 +161,7 @@ export const doLoginWithLiff = async (accesstoken: string, idToken: string):Prom
   try {
     const payload = (decodeJWT(idToken).payload) as OIDCIdToken
     console.log(161, accesstoken, payload)
+    debugger
     // const email = process.env.stage === 'prod' ? (payload.email ?? 'email error') : 'jjformosa1220+2@gmail.com'
     const email = payload.email ?? 'email error'
     const username = email
