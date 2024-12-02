@@ -42,12 +42,8 @@ export const handler: DefineAuthChallengeTriggerHandler = async (event) => {
           }
         ]
       }
-      if (name) createUserParams.UserAttributes.push({ Name: 'name', Value: name })
-      if (picture) createUserParams.UserAttributes.push({ Name: 'picture', Value: picture })
-      console.log('createUserParams', createUserParams)
-      const createUserResponse = await cognitClient.adminCreateUser(createUserParams).promise()
-      console.log('createUserResponse', createUserResponse)
-      event.response.challengeName = 'CUSTOM_CHALLENGE'
+      event.response.issueTokens = false
+      event.response.failAuthentication = true
     } else { //這段會觸發UserPool向前端發起挑戰
       event.response.challengeName = 'CUSTOM_CHALLENGE'
     }
