@@ -46,7 +46,7 @@ export const verifyIdTokenWithLiff = async function (id_token: string, client_in
 }
 
 export const verifyAccessTokenWithLiff = async function (access_token: string): Promise<[boolean, string]> {
-  const client_id = process.env.LIFF_ID
+  const client_id = process.env.LINE_ID
   if (!client_id) return [false, 'liff client_id need']
 
   const verifyResponse = await axios.get('https://api.line.me/oauth2/v2.1/verify', {
