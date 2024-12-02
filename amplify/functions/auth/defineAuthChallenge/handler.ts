@@ -7,6 +7,7 @@ const cognitClient = new AWS.CognitoIdentityServiceProvider()
 export const handler: DefineAuthChallengeTriggerHandler = async (event) => {
   event.response.issueTokens = false
   event.response.failAuthentication = false
+  const { email, picture, name } = event.request.clientMetadata ?? {}
   const [challengeResponse] = event.request.session
   if (challengeResponse?.challengeName === 'CUSTOM_CHALLENGE') {
     // 代表本次請求來自某一則session的挑戰回應
@@ -15,9 +16,9 @@ export const handler: DefineAuthChallengeTriggerHandler = async (event) => {
     event.response.issueTokens = challengeResult
     event.response.failAuthentication = !challengeResult
   } else {
-    console.log('userAttributes')
-    printEachOfStringMap(event.request.userAttributes)
-    const email = event.request.userAttributes.email
+    // console.log('userAttributes')
+    // printEachOfStringMap(event.request.userAttributes)
+    // const email = event.request.userAttributes.email
     // 代表本次請求來自某個Amplify Client的首次請求
     const filterParams = {
       UserPoolId: event.userPoolId,

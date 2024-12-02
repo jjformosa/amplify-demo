@@ -161,19 +161,21 @@ export const doLoginWithLiff = async (accesstoken: string, idToken: string):Prom
   try {
     const payload = (decodeJWT(idToken).payload) as OIDCIdToken
     console.log(161, accesstoken, payload)
-    debugger
     // const email = process.env.stage === 'prod' ? (payload.email ?? 'email error') : 'jjformosa1220+2@gmail.com'
-    const email = payload.email ?? 'email error'
+    const { email, name, picture } = payload ?? {}
+    if (!email) throw new Error('email is null')
+    if (!name) throw new Error('email is name')
+    if (!picture) throw new Error('email is picture')
     const username = email
-    const clientMetadata = { identitySource : 'liff' } // 這算是重點，寄望這個參數之後可以支援其他socail login的擴充
+    const clientMetadata = { identitySource : 'liff', email, name,  } // 這算是重點，寄望這個參數之後可以支援其他socail login的擴充
     const signInInput: SignInInput = {
       username,
       options: {
         authFlowType: 'CUSTOM_WITHOUT_SRP',
         userAttributes: {
           email,
-          name: payload.name,
-          picture: payload.picture,
+          name,
+          picture,
           'custom:liffId': payload.sub,
           'custom:liffAccessToken': accesstoken
         },
