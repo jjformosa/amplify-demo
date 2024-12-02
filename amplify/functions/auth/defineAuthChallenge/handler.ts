@@ -7,6 +7,7 @@ const cognitClient = new AWS.CognitoIdentityServiceProvider()
 export const handler: DefineAuthChallengeTriggerHandler = async (event) => {
   event.response.issueTokens = false
   event.response.failAuthentication = false
+  console.log('event', event.request.userNotFound)
   const { email, picture, name } = event.request.clientMetadata ?? {}
   const [challengeResponse] = event.request.session
   if (challengeResponse?.challengeName === 'CUSTOM_CHALLENGE') {
