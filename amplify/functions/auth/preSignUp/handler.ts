@@ -15,14 +15,14 @@ export const handler: PreSignUpTriggerHandler = async (event: PreSignUpTriggerEv
       AttributesToGet: ['email'],
       Filter: `email = "${email}"`
     }
+    let provider = 'liff', provider_id = ''
+    if (event.userName.startsWith('Facebook')) provider = 'Facebook', provider_id = ''
+    else if (event.userName.startsWith('Google')) provider = 'Google', provider_id = ''
+    // TODO 接受多重登入身份
+    // TODO 切換provider?
+    // TODO 覆寫attributes
     const listUsersResponse = await cognitClient.listUsers(filterParams).promise()
     if (listUsersResponse.Users && listUsersResponse.Users!.length > 0) {
-      // TODO 接受多重登入身份
-      // TODO 切換provider?
-      let provider = 'liff', provider_id = ''
-      if (event.userName.startsWith('Facebook')) provider = 'Facebook', provider_id = ''
-      else if (event.userName.startsWith('Google')) provider = 'Google', provider_id = ''
-      // TODO 覆寫attributes
       // 如果用戶已存在，則更新其identities屬性
       const existingUser = listUsersResponse.Users[0]
       const existingSub = existingUser.Username ?? email
@@ -56,6 +56,7 @@ export const handler: PreSignUpTriggerHandler = async (event: PreSignUpTriggerEv
           default:
             break
         }
+        event.userName = email
         if (identitySource === 'email') {
           event.response.autoConfirmUser = false
           event.response.autoVerifyEmail = false
