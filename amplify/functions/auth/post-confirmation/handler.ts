@@ -50,7 +50,7 @@ export const handler: PostConfirmationTriggerHandler = async (event) => {
     const listUsersResponse = await client.listUsers(filterParams).promise()
     if (listUsersResponse.Users && listUsersResponse.Users!.length > 0) {
       for (const user of listUsersResponse.Users!) {
-        if (user.Username !== email) {
+        if (user.UserStatus === 'EXTERNAL_PROVIDER' && user.Username !== event.userName) {
           const [ providerName, providerId, sub ] = splitFederateUser(user.Username!)
           const linkProviderParams = {
             DestinationUser: {
@@ -64,6 +64,7 @@ export const handler: PostConfirmationTriggerHandler = async (event) => {
             },
             UserPoolId: event.userPoolId
           }
+          console.log(`link ${event.userName} to ${providerName}, ${providerId}, ${sub}`)
           await client.adminLinkProviderForUser(linkProviderParams).promise()
         }
       }
