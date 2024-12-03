@@ -325,7 +325,9 @@ export const doRegisterByLiff = async (idToken: string, accesstoken: string): Pr
       userAttributes: {
         email,
         name,
-        picture: picture as string
+        picture: picture as string,
+        'custom:liffId': sub,
+        'liffToken': accesstoken
       }
     }
   }
