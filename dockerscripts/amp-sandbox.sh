@@ -1,0 +1,1 @@
+docker run -it -v ${HOME}/.aws:/root/.aws -v .:/app -w /app node:22-alpine sh

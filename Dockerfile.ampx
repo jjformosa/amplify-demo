@@ -1,0 +1,19 @@
+FROM node:22-alpine
+
+# Install required dependencies
+RUN apk add --no-cache \
+    curl \
+    unzip \
+    groff \
+    less
+
+# Install AWS CLI v2
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
+    && unzip awscliv2.zip \
+    && ./aws/install \
+    && rm -rf aws awscliv2.zip
+
+WORKDIR /app
+
+# Verify AWS CLI installation
+RUN aws --version

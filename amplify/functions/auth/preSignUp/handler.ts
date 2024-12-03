@@ -69,11 +69,10 @@ export const handler: PreSignUpTriggerHandler = async (event: PreSignUpTriggerEv
     if (identitySource === 'email') {
       event.response.autoConfirmUser = false
       event.response.autoVerifyEmail = false
-    } 
-    // else { //暫時用不上，外部登入者都會被
-    //   event.response.autoConfirmUser = true
-    //   event.response.autoVerifyEmail = true
-    // }
+    } else {
+      event.response.autoConfirmUser = true
+      event.response.autoVerifyEmail = true
+    }
     console.log(`create new user: ${event.userName}`)
   } catch (ex) {
     console.log(`preSignUp error: ${ex}`)
