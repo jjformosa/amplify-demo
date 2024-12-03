@@ -1,6 +1,7 @@
 import { 
   type PreSignUpTriggerHandler,
   type PreSignUpTriggerEvent } from 'aws-lambda'
+  import { splitFederateUser } from '../utils' 
 import AWS from 'aws-sdk'
 
 const cognitClient = new AWS.CognitoIdentityServiceProvider()
@@ -16,60 +17,67 @@ export const handler: PreSignUpTriggerHandler = async (event: PreSignUpTriggerEv
       AttributesToGet: ['email'],
       Filter: `email = "${email}"`
     }
-    let provider = 'email', providerId = '', sub = ''
-    if (event.userName.startsWith('Facebook')) {
-      // TODO
-      provider = 'Facebook'
-      providerId = ''
-      sub = event.userName.split('_')[1]
-    }
-    else if (event.userName.startsWith('Google')) {
-      // TODO
-      provider = 'Google'
-      providerId = ''
-      sub = event.userName.split('_')[1]
-    }
-    else if (event.userName.startsWith('amplify-demo-liff')) {
-      provider = 'liff'
-      providerId = 'amplify-demo-liff'
-      sub = event.userName.split('_')[1]
-    }
-    // TODO 接受多重登入身份
-    // TODO 切換provider?
-    // TODO 覆寫attributes
-    const listUsersResponse = await cognitClient.listUsers(filterParams).promise()
-    if (listUsersResponse.Users && listUsersResponse.Users!.length > 0) {
-      // 如果用戶已存在，而現在使用者不是信箱註冊，只執行linkProvider而不註冊
-      if (provider !== 'email') {
-        //linkProvider(current)to exist User
-        const current = listUsersResponse.Users![0]
-        const linkProviderParams = {
-          DestinationUser: {
-            ProviderAttributeValue: current.Username ?? email,
-            ProviderName: 'Cognito'
-          },
-          SourceUser: {
-            ProviderAttributeName: 'Cognito_Subject',
+    const [provider, providerId, sub] = splitFederateUser(event.userName)
+    let currentUser = null
+    if (provider !== 'email') {
+      const listUsersResponse = await cognitClient.listUsers(filterParams).promise()
+      // need to checkout user with email exists, if not, create user and link current provider info
+      if (!listUsersResponse.Users || listUsersResponse.Users!.length === 0) {
+        // create new user
+        const createUserParams = {
+          UserPoolId: event.userPoolId,
+          Username: email,
+          DesiredDeliveryMediums: ['EMAIL'],
+          ForceAliasCreation: false,
+          UserAttributes: [
+            {
+              Name: 'email',
+              Value: email
+            },
+            {
+              Name: 'email_verified',
+              Value: 'true'
+            }
+          ]
+        }
+        const createUserResponse = await cognitClient.adminCreateUser(createUserParams).promise()
+        currentUser = createUserResponse.User
+        console.log(`auto create new user: ${email}`)
+      } else {
+        currentUser = listUsersResponse.Users![0]
+      }
+      if (!currentUser) throw new Error('User not found')
+      // link provider
+      const linkProviderParams = {
+        DestinationUser: {
+          ProviderAttributeValue: currentUser.Username!,
+          ProviderName: 'Cognito'
+        },
+        SourceUser: {
+          ProviderAttributeName: 'Cognito_Subject',
             ProviderAttributeValue: sub,
             ProviderName: providerId
           },
           UserPoolId: event.userPoolId
         }
-        await cognitClient.adminLinkProviderForUser(linkProviderParams).promise()
-        throw new Error('User already exists')
-      }
+      await cognitClient.adminLinkProviderForUser(linkProviderParams).promise()
+      console.log(`link provider: ${provider} ${providerId} ${sub} to ${currentUser.Username}`)
+      throw new Error('user from external provider can only offer identity info')
     }
+
     const identitySource = clientMetadata.identitySource
     if (identitySource === 'email') {
       event.response.autoConfirmUser = false
       event.response.autoVerifyEmail = false
-    } else {
-      event.response.autoConfirmUser = true
-      event.response.autoVerifyEmail = true
-    }
+    } 
+    // else { //暫時用不上，外部登入者都會被
+    //   event.response.autoConfirmUser = true
+    //   event.response.autoVerifyEmail = true
+    // }
     console.log(`create new user: ${event.userName}`)
   } catch (ex) {
     console.log(`preSignUp error: ${ex}`)
+    throw ex
   }
   return event
 }

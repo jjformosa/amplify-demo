@@ -40,6 +40,22 @@ Amazone Q其實讓我失望了不少次，包括他對userAttributes的說明只
     }
 ```
 
+測試以後發現，這次它還真的對極了，只剩下一個坑，實際場景非常容易撞到一個errormessage:**Merging is not currently supported, provide a SourceUser that has not been signed up in order to link**，從字面上的意思看，當作為SourceUser的帳號已經存在，就不能被Link了，這也難怪Amazon Q的範例是在AdminLinkProviderForUser後做throw。從preSign的角度看這倒不是甚麼太大的問題，能創造的體驗也很多，例如:
+1. 不存在email/password的帳號，就先用adminCreateUser
+2. 直接throw但把External Provider的資料暫存到NoSQL，前端要求使用者先填寫註冊表單
+3. 在使用者首次用密碼登入或忘記密碼的時候，才做資料遷徙
+4. 維持不同帳號存在，直到活動在做資料清理與遷徙
+當然我不可能全都實作出來，而我的短期目標其實是*讓使用者有一個身分可以接受跨平台的訊息*，例如接受line的留言和加入好友通知、來自FB的關注通知、使用GoogleMeet、Clander甚至email功能排班，甚至來自trello、github、DC......等等的通知，都可以用一個身分去整合、執行業務，而且管理者很容易轉移身分到其他同事身上。
+
+乍想之下，實現上面的目標，光靠第一個解方就夠了，故這個專案也暫時先用這樣，日後如果發現甚麼不足的部分再作處理。最後再附上AWS CLI版本AdminLinkProviderForUserCommand指令，這樣要驗證資料比較方便，不用一直部署(燒錢)
+```sh
+aws cognito-idp admin-link-provider-for-user \
+--user-pool-id <userpoolId> \
+--destination-user ProviderAttributeValue=<dist-userName>,ProviderName=Cognito \
+--source-user ProviderName=<external provider name>,ProviderAttributeName=Cognito_Subject,ProviderAttributeValue=<sub from OIDC> \
+--profile <aws profile name>
+```
+
 ## 麻煩但又好用的permission
 這邊必須提醒，要讓Lambda Trigger可以幫忙處理上面的邏輯，必須給予該Lambda對應的Permission，而我到目前還沒找到在Amplify的resources中直接賦予policy或者permission的方法，如果有觀眾知道怎麼作還請告知
 
