@@ -4,6 +4,8 @@ import preAuthentication from '../functions/auth/preAuthentication/resource';
 import defineAuthChallenge from '../functions/auth/defineAuthChallenge/resource';
 import createAuthChallenge from '../functions/auth/createAuthChallenge/resource';
 import verifyAuthChallengeResponse from '../functions/auth/verifyAuthChallengeResponse/resource';
+import preSignUp from '../functions/auth/preSignUp/resource';
+import postConfirmation from '../functions/auth/post-confirmation/resource'
 
 /**
  * Define and configure your auth resource
@@ -32,10 +34,12 @@ export const auth = defineAuth({
     }
   }, 
   triggers: {
-    preAuthentication: preAuthentication,
-    defineAuthChallenge: defineAuthChallenge,
-    createAuthChallenge: createAuthChallenge,
-    verifyAuthChallengeResponse: verifyAuthChallengeResponse
+    preAuthentication,
+    defineAuthChallenge,
+    createAuthChallenge,
+    verifyAuthChallengeResponse,
+    preSignUp,
+    postConfirmation
   }
 });
 

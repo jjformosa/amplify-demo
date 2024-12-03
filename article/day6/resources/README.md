@@ -8,4 +8,4 @@
 其實認真說只有4.是問題就是了，所以眼下我們有三個解法
 1. 雖然challenge無法使用client的參數，但終究會有登入失敗，還是可以在lambda trigger throw 特定的exception message讓前端知道下一步需要註冊。
 2. 另外開一個API，登入前先用adminListUser掃帳號，再決定下一步。但安全地使用Amplify客製化的API，我打算後面章節再說明，已經很熟係的人可以考慮優先這樣處理。但有另一個隱患是，Cognito都已經特地隱藏帳號不存在了，又去開這支API感覺有點破壞設計原則。
-3. 實作preSign和confirmPost，接走External Provider的處理。
+3. 實作preAuth、preSign和confirmPost，接走External Provider的處理。
