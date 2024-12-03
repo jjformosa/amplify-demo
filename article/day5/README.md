@@ -25,6 +25,9 @@
 ## 處理註冊
 使用Cognito、Amplify的預設介面和流程的時候，新帳戶會自動實現註冊(甚至信箱認證)，但是如果是自己呼叫SignIn API，就要自己處理帳號不存在、註冊(SignUp)等工作了。
 
+### 24/12/02 大修正
+Day5 之前的程式碼
+
 ```typescript
 // amplify/functions/defineAuthChallenge/handler.ts
 
@@ -48,11 +51,136 @@ else {
     }
   }
 ```
-我們要處理的是上面的程式碼中的情境，另外提一下
-> 必須賦予這個lambda相對應listUsers on UserPool(Cognito)的permission，目前我都是手動處理，還沒有找到在amplify/auth/resources上面處理的方法，雖然Amazon Q覺得有，如果有人知道方法還請交流
+其實是沒有作用的，雖然AWS每一份關於自訂挑戰的文件都指出，可以在defineAuthChallenge取得clientMetaData與userAttributes，但經過兩天一夜的測試結果是:
+1. 當帳號不存在(在我的case是email)，會在defineAuthChallenge收到以下具指標性的資料
+```typescript
+// amplify/functions/defineAuthChallenge/handler.ts
+const { email, picture, name } = event.request.clientMetadata ?? {}  // {}
+console.log('event', email, picture, name)                           // undefined, undefined, undefined
+console.log('event', event.request.userNotFound)                     // true
+...
+const e = event.request.userAttributes.email                         // undefined
+```
+2. 當帳號存在
+```typescript
+// amplify/functions/defineAuthChallenge/handler.ts
+const { email, picture, name } = event.request.clientMetadata ?? {}  // {}
+console.log('event', email, picture, name)                           // undefined, undefined, undefined
+console.log('event', event.request.userNotFound)                     // false
+...
+const e = event.request.userAttributes.email                         // email
+```
+重點: **這時候的userAttributes，其實是來自cognito內已經存在的使用者資料取得的，並不是Amplify Auth Client發出的內容。**
 
-![ans by Amazon Q, vs fact](./resources/p1.png)
+取得的userAttributes有不是程式碼送出的屬性
 
-其實也可以使用上面的程式碼，讓前端自己決定要不要自動完成註冊動作(可以參考/src/services/amplify/auth.ts, doRegisterByLiff的部分)，實際上我自己也是採用這個方法，以免客戶有需要做額外的UX，所以為了~~採坑~~ 練習，這邊我就刻意試著修改defineAuthChallenge，直接用AWS sdk註冊使用者。
+![取得的userAttributes有不是程式碼送出的屬性](./resources/p3.png)
 
-![Amazon Q發揮一下](./resources/p2.gif)
+3. 但是defineAuthChallenge並不會觸發使用者不存在的錯誤，要一直到verfifyAuthChallenge才會收到相關錯誤
+```typescript
+// src/services/amplify/auth.ts
+try {
+    const payload = (decodeJWT(idToken).payload) as OIDCIdToken
+    console.log(161, accesstoken, payload)
+    const { email, name, picture } = payload
+    if (!email) throw new Error('email is null')
+    if (!name) throw new Error('email is name')
+    if (!picture) throw new Error('email is picture')
+    const username = email
+    const clientMetadata = { identitySource : 'liff', email, name } // 這算是重點，寄望這個參數之後可以支援其他socail login的擴充
+    const signInInput: SignInInput = {
+      username,
+      options: {
+        authFlowType: 'CUSTOM_WITHOUT_SRP',
+        userAttributes: {
+          email,
+          name,
+          picture,
+          'custom:liffId': payload.sub,
+          'custom:liffAccessToken': accesstoken
+        },
+        clientMetadata
+      }
+    }
+    const { isSignedIn, nextStep } = await signIn(signInInput)            // 這邊會通過
+    console.log(181, isSignedIn)
+    console.log(isSignedIn, nextStep.signInStep)
+    if (nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_CUSTOM_CHALLENGE') {
+      if (!payload.email) throw new Error('payload.email is null')
+      const confirmSignInOutput = await confirmSignIn({                  // 這邊才會跳到exception
+        challengeResponse: accesstoken,
+        options: {
+          clientMetadata
+        }
+      })
+      if (confirmSignInOutput.isSignedIn) {
+        console.log('aws cognito signin')
+      } else {
+        console.log(confirmSignInOutput.nextStep)
+      }
+      return { ...confirmSignInOutput }
+      // const question = nextStep.additionalInfo!.question.split(',')
+      // const challenge = formatChallenge(nextStep.additionalInfo!.question, redirectUri)
+      // sendTextMessage(challenge)
+      // return { isSignedIn, nextStep, question}
+    } else {
+      return { isSignedIn }
+    }
+  } catch (ex) {
+    console.error(`doLoginWithLiff: ${ex}`)
+    return { isSignedIn: false }
+  }
+```
+
+看紀錄是400錯誤，並且可以指到真實程式碼行數
+
+![networkerror]
+
+4. 如果有[啟用PreventUserExistenceErrors](https://docs.aws.amazon.com/zh_tw/cognito/latest/developerguide/user-pool-lambda-define-auth-challenge.html)，會導致即使被Cognito判定帳號不存在，client端也收到帳號密碼錯誤，AWS覺得這樣比較安全。
+5. 本來上面的狀況沒甚麼，但接下來的情境相當魔幻，因為我們的練習過程，讓測試者可以提前用Cognito的登入介面完成登入和註冊，也會看到userpool裡面確實有結果
+
+![透過cognito完成登入註冊的帳號](./resources/p5.png)
+
+但是，defineAuthChallenge卻是userNotFound狀態
+
+![在cognito註冊後，使用custom登入](./resources/p6.png)
+
+這時候如果把程式碼改成
+```typescript
+// src/services/amplify/auth.ts
+try {
+  ......
+    const payload = (decodeJWT(idToken).payload) as OIDCIdToken
+    const { email, name, picture } = payload
+    const sub = payload.sub?.toLocaleLowerCase()
+    const username = `amplify-demo-liff_${sub}`
+    const clientMetadata = { identitySource : 'liff', email, name } // 這算是重點，寄望這個參數之後可以支援其他socail login的擴充
+    const signInInput: SignInInput = {
+      username,
+      options: {
+        authFlowType: 'CUSTOM_WITHOUT_SRP',
+        userAttributes: {
+          email,
+          name,
+          picture,
+          'custom:liffId': payload.sub,
+          'custom:liffAccessToken': accesstoken
+        },
+        clientMetadata
+      }
+    }
+  ......
+```
+
+噹啦~~帳號就被找到了
+
+![使用username登入而不是email](./resources/p7.png)
+
+這也是害我找了兩天一夜的元凶，**透過練習，external provider註冊的帳號，雖然也有開啟email登入，但真的用同一個email去登入時不會被當作同個帳號**，加上PreventUserExistenceErrors會對client隱藏server判斷帳號不存在，讓client的操作更難判斷。
+
+6. 如果反過來，我們先用程式碼註冊，再使用外部登入者，也會得到類似的結果，這也許意味著，~~之後研究怎麼整合帳號更有價值了~~，每種登入提供者(SDK也算一種)，都要先假設他們是獨立的帳戶。
+
+![一樣有兩個獨立的帳號](./resources/p8.png)
+
+## 下一章
+因為篇幅感覺有點長了，怎麼處理signUp流程就下一章再繼續。

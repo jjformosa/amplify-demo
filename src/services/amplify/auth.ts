@@ -163,6 +163,7 @@ export const doLoginWithLiff = async (accesstoken: string, idToken: string):Prom
     console.log(161, accesstoken, payload)
     // const email = process.env.stage === 'prod' ? (payload.email ?? 'email error') : 'jjformosa1220+2@gmail.com'
     const { email, name, picture } = payload
+    const sub = payload.sub?.toLocaleLowerCase() ?? ''
     if (!email) throw new Error('email is null')
     if (!name) throw new Error('email is name')
     if (!picture) throw new Error('email is picture')

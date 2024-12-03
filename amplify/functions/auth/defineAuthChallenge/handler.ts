@@ -8,8 +8,8 @@ export const handler: DefineAuthChallengeTriggerHandler = async (event) => {
   event.response.issueTokens = false
   event.response.failAuthentication = false
   const { email, picture, name } = event.request.clientMetadata ?? {}
-  console.log('event', event.request.userNotFound)
   console.log('event', email, picture, name)
+  console.log('event', event.request.userNotFound)
   const [challengeResponse] = event.request.session
   if (challengeResponse?.challengeName === 'CUSTOM_CHALLENGE') {
     // 代表本次請求來自某一則session的挑戰回應
@@ -20,7 +20,7 @@ export const handler: DefineAuthChallengeTriggerHandler = async (event) => {
   } else {
     console.log('userAttributes')
     printEachOfStringMap(event.request.userAttributes, 'userAttributes')
-    const e = 'jjformosa1220@gmail.com'
+    const e = event.request.userAttributes.email
     // 代表本次請求來自某個Amplify Client的首次請求
     const filterParams = {
       UserPoolId: event.userPoolId,
