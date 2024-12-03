@@ -134,7 +134,7 @@ try {
 
 看紀錄是400錯誤，並且可以指到真實程式碼行數
 
-![networkerror]
+![networkerror](./resources/p4.png)
 
 4. 如果有[啟用PreventUserExistenceErrors](https://docs.aws.amazon.com/zh_tw/cognito/latest/developerguide/user-pool-lambda-define-auth-challenge.html)，會導致即使被Cognito判定帳號不存在，client端也收到帳號密碼錯誤，AWS覺得這樣比較安全。
 5. 本來上面的狀況沒甚麼，但接下來的情境相當魔幻，因為我們的練習過程，讓測試者可以提前用Cognito的登入介面完成登入和註冊，也會看到userpool裡面確實有結果
@@ -186,5 +186,6 @@ try {
 1. External Provider的登入者，username是exteranl provider name_${可自訂}，且必須以該username作為帳號識別
 2. 透過sdk建立的帳號，跟Exteranl Provider無關
 3. authchallenge有自己判斷帳號是否存在的流程，可以在trigger檢查，或者等verifyChallenge處理檢查結果。
+4. Cognito的使用email別名做登入、檢查，似乎只對SDK或手動建立帳戶有效。
 
 因為篇幅感覺有點長了，怎麼處理signUp流程就下一章再繼續。
