@@ -56,7 +56,7 @@ export const handler: PreSignUpTriggerHandler = async (event: PreSignUpTriggerEv
           default:
             break
         }
-        event.userName = email
+        // event.userName = email
         if (identitySource === 'email') {
           event.response.autoConfirmUser = false
           event.response.autoVerifyEmail = false
