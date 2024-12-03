@@ -182,5 +182,9 @@ try {
 
 ![一樣有兩個獨立的帳號](./resources/p8.png)
 
-## 下一章
+## Summary
+1. External Provider的登入者，username是exteranl provider name_${可自訂}，且必須以該username作為帳號識別
+2. 透過sdk建立的帳號，跟Exteranl Provider無關
+3. authchallenge有自己判斷帳號是否存在的流程，可以在trigger檢查，或者等verifyChallenge處理檢查結果。
+
 因為篇幅感覺有點長了，怎麼處理signUp流程就下一章再繼續。
