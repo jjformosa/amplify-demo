@@ -47,6 +47,6 @@ Amazone Q也沒有正確解答
 
 ![Amazone Q也沒有正確解答](./resources/p1.png)
 
-
+記得給權限給最小範圍的資源就好，畢竟這是帳號管理，一弄亂就很難處理
 
 ![手動給Lambda權限](./resources/p2.png)
