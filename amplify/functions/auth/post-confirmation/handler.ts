@@ -25,6 +25,7 @@ const splitFederateUser = (userName: string) => {
     provider = 'liff'
     providerId = 'amplify-demo-liff'
     sub = userName.split('_')[1]
+    sub = sub[0].toUpperCase() + sub.substring(1)
   }
   return [provider, providerId, sub]
 }
