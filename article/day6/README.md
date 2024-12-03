@@ -48,4 +48,5 @@ Amazone Q也沒有正確解答
 ![Amazone Q也沒有正確解答](./resources/p1.png)
 
 
+
 ![手動給Lambda權限](./resources/p2.png)
