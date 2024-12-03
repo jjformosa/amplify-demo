@@ -16,22 +16,22 @@ export const handler: PreSignUpTriggerHandler = async (event: PreSignUpTriggerEv
       AttributesToGet: ['email'],
       Filter: `email = "${email}"`
     }
-    let provider = 'email', provider_id = '', sub = ''
+    let provider = 'email', providerId = '', sub = ''
     if (event.userName.startsWith('Facebook')) {
       // TODO
       provider = 'Facebook'
-      provider_id = ''
+      providerId = ''
       sub = event.userName.split('_')[1]
     }
     else if (event.userName.startsWith('Google')) {
       // TODO
       provider = 'Google'
-      provider_id = ''
+      providerId = ''
       sub = event.userName.split('_')[1]
     }
     else if (event.userName.startsWith('amplify-demo-liff')) {
       provider = 'liff'
-      provider_id = 'amplify-demo-liff'
+      providerId = 'amplify-demo-liff'
       sub = event.userName.split('_')[1]
     }
     // TODO 接受多重登入身份
@@ -51,7 +51,7 @@ export const handler: PreSignUpTriggerHandler = async (event: PreSignUpTriggerEv
           SourceUser: {
             ProviderAttributeName: 'Cognito_Subject',
             ProviderAttributeValue: sub,
-            ProviderName: provider
+            ProviderName: providerId
           },
           UserPoolId: event.userPoolId
         }

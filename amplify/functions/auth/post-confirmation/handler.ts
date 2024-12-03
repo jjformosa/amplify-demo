@@ -51,7 +51,7 @@ export const handler: PostConfirmationTriggerHandler = async (event) => {
     if (listUsersResponse.Users && listUsersResponse.Users!.length > 0) {
       for (const user of listUsersResponse.Users!) {
         if (user.Username !== email) {
-          const [ providerName, proivderId, sub ] = splitFederateUser(user.Username!)
+          const [ providerName, providerId, sub ] = splitFederateUser(user.Username!)
           const linkProviderParams = {
             DestinationUser: {
               ProviderAttributeValue: event.userName ?? email,
@@ -60,7 +60,7 @@ export const handler: PostConfirmationTriggerHandler = async (event) => {
             SourceUser: {
               ProviderAttributeName: 'Cognito_Subject',
               ProviderAttributeValue: sub,
-              ProviderName: providerName
+              ProviderName: providerId
             },
             UserPoolId: event.userPoolId
           }

@@ -75,7 +75,10 @@ export const AmplifyAuthProvider: React.FC<AmplifyAuthCongigure> = ({ children }
       await AwsAuth.doLiginWithEmailPwd(email, password)
     } else if (identitySource === 'liff') {
       const { accesstoken, idToken } = args as LINE_LOGIN_PARAM
-      await AwsAuth.doLoginWithLiff(accesstoken, idToken)
+      const { isSignedIn } = await AwsAuth.doLoginWithLiff(accesstoken, idToken)
+      if (!isSignedIn) {
+        await AwsAuth.doRegisterByLiff(idToken, accesstoken)
+      }
     }
     setBusy(false)
   }, [inited])

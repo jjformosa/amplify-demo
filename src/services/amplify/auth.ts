@@ -35,6 +35,7 @@ export const isLoggedIn = async ():Promise<boolean> => {
 
 export type LoginResult = {
   isSignedIn: boolean,
+  errMsg?: string,
   nextStep?: {
     signInStep?: string,
     signUpStep?: string,
@@ -208,7 +209,7 @@ export const doLoginWithLiff = async (accesstoken: string, idToken: string):Prom
     }
   } catch (ex) {
     console.error(`doLoginWithLiff: ${ex}`)
-    return { isSignedIn: false }
+    return { isSignedIn: false, errMsg: ex as string }
   }
 }
 
@@ -324,9 +325,7 @@ export const doRegisterByLiff = async (idToken: string, accesstoken: string): Pr
       userAttributes: {
         email,
         name,
-        picture: picture as string,
-        'custom:liffId': sub,
-        'custom:line_access_token': accesstoken
+        picture: picture as string
       }
     }
   }
