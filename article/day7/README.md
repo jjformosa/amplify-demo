@@ -14,7 +14,9 @@
 ## 甚麼是hook
 先抱怨一下這個名字實在是被太濫用了。
 在ReactJS剛問世的時候，官方分了兩大類寫法:class和functional Component, 我不太確定是不是剛好對應OOP與FP風格，總之那時只有class可以透過state的管理做到局部、自我更新資料來更新畫面，而functional只能接收props，沒有辦法透過更新自己的資料來改變畫面，必須開callback或是將dispatcher當作props，傳到functional Component中，透過事件去更新父(class)元件的state=>props=>子(functional)元件。
+
 這個模式使得資料可以很安全，而且functional Component相當輕巧、易複用，但是在複雜的畫面上，這就造成一個問題，假設有一個子元件跟持有state的根元件距離十個元件之遠，而中間的元件都不需要使用根的某筆資料，但是為了要傳遞給10代以外的子元件，中間的元件就都要開Props來做傳遞。這會造成中間層的可維護性大幅下滑。
+
 > 例如，畫面中有一個登入者的Profile資訊固定在左上角，但是UI/UX導致某個主畫面中的小功能，可以臨時修改Profile，OK，如果是這樣，可能工程師看到線稿或設計稿就知道要一路傳遞資料到10代開外；但如果這個編輯器，是在某個按鈕點擊後的對話盒，一些資深的**前端工程師** 可以設計一個全域、被臨時呼叫Show Model機制。但如果，這需求本身來自需求變更呢?
 ### useContext
 後來出現context這個工具來解決資料傳遞的問題，被context.provider包覆的元件都可以透過Context取得資料或者呼叫功能，不管元件在Component的位階在第幾層。
@@ -56,9 +58,13 @@ setLiffState({
 class Componet相較於functional Component有兩個重點
 1. 只有class Component能用state。
 2. 只有class Component有lifecycle。
+
 其實說穿了，就是可以變動的交給Class Component管理，Functional Component只作為揭露資料的存在，但是，state跟lifecycle就很難管/懂啊，而且官方都出Context了，不給Functional Component反應資料變更是怎樣?~~而且Junior的事件亂噴看起來也很刺眼~~。
+
 但是不要忘了，稍早說到ReatJS這類lib，最核心的還是解決渲染效能的問題，就連狀態管理都是隨之而來的解決方案不是本體，**但一個工具或框架要永續生存，就不得不解決使用者遭遇到的問題**，軟體工程有一個很好的概念形容這件事情:*side effect*，狀態管理是ReactJS這套lib的解決方案，可是也產生了狀態機本身不好維護的副作用，而hook是解決這些副作用的工具，尤其是，好吧!官方接受Functional Component需要反應資料改變，但依然要限制變化，避免重新渲染的副作用。這就是為什麼，useEffect是hook最重要的工具(至少我希望它是，哈)。
+
 useEffect的結構提供兩個參數，第一個位置需要一個function, 第二個位置是一個陣列，意思是陣列裡面的值有變更的時候，會**觸發function執行**。
+
 在3~5年前，印象中會看到useEffect在Functional Component用來實踐類似lifecycle的機制，今年我在複習的時候已經看不太到這種說法了。但舉例來說:
 ```typescript
 // src/context/LiffContext.tsx
@@ -116,6 +122,7 @@ liff的變化會產生副作用，需要重新檢查使用者是否登入、嘗�
   }, [liff])
 ```
 我也要藉這章開始收斂一些實驗性的寫法，這邊會看到其實跟上一段程式碼有重工，原本我的習慣是登入成功後，不太介意是頁面/元件先呼叫getAccessToken，還是auth的狀態機先完成初始化，因為也有可能使用者的頁面很急著要accessToken去進行下一步，不想等auth連idToken、profile都完成初始化。但其實這可以交給更應用層次而不是在Context做決定。
+
 另外被我註解掉的一段，如果反註解回來，會發現呼叫doGetAccessToken收到的成果還是null，這是因為setAuth後，auth並沒有立即更新accessToken。
 ```javascript
 if (!auth.accessToken) {
@@ -265,8 +272,8 @@ if (authContext.isLoggedIn()) {
     //backToLogin
 }
 ```
-最大的不同應該在React的各部分元件，只透過hook或者context，關注它們需要反應的資料 vs 傳統的Page需要持有並認識所有的子/父甚至兄弟元件，在更新資料後一個個assign新的值。我知道也有框架用IoC等模式去優化這個問題，雙向綁定也很好，就只是ReactJS採取了單向資料流而已，模式沒甚麼絕對的優劣，熟悉它的特性就好。比如說到pub/sub，單向資料流一定比IoC或雙向綁定的框架更適合，但如果遇到一定要pub/sub的場景，它們也一定有解決方案。
+最大的不同應該在React的各部分元件，只透過hook或者context，關注它們需要反應的資料 vs 傳統的Page需要持有並認識所有的子/父甚至兄弟元件，在更新資料後一個個assign新的值。我知道也有框架用IoC等模式去優化這個問題，雙向綁定也很好，就只是ReactJS採取了單向資料流而已，模式沒甚麼絕對的優劣，熟悉它的特性就好。比如說到pub/sub，單向資料流一定比IoC或雙向綁定的框架更適合，但如果遇到一定要pub/sub的場景，它們也一定有解決方案，只是沒那麼直觀、成果可能略有瑕疵。
 
-> 需求其實跟技術選型息息相關，工程師:「早說，你為何不早說」
+我可以理解如果需求沒有早點被挖掘，在其他框架下想要做到ReactJS專案的獨特效果，可能並不好處理，引發工程部的抱怨。但反過來說，我們真的熟悉每個工具適用的場景或者解法空間了嗎?其實回顧這幾年，特別是近年自己也用了不少不恰當的解決方案@@。
 
 [^1]:[事件風暴-領域建模](https://www.slideshare.net/slideshow/ss-125442613/125442613#40)
