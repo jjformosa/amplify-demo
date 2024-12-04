@@ -22,16 +22,16 @@ export type { IdentitySource, AmplifyAuthService, OIDCService, AmplifyAuthCongig
 
 export const AmplifyAuthContext = createContext<AmplifyAuthService>({
   isBusy: false,
-  auth: null,
   doLogin: async () => {},
   doLogout: async () => {},
   doRegister: async () => {},
-  doGetAccessToken: async () => null,
+  getAccessToken: async () => null,
   getIdToken: async () => null,
   getDecodedIdToken: async () => null,
   getProfile: async () => null,
-  isAuth: async () => false,
-  accessToken: null
+  accessToken: null,
+  idToken: null,
+  idTokenPayload: null
 })
 
 export const AmplifyAuthProvider: React.FC<AmplifyAuthCongigure> = ({ children }) => {
@@ -61,14 +61,9 @@ export const AmplifyAuthProvider: React.FC<AmplifyAuthCongigure> = ({ children }
     setBusy(false)
   }, [inited])
 
-  const isAuth = useCallback(async () => {
-    if (!inited) return false
-    return (await doGetAccessToken()) !== null
-  }, [inited])
-
   const doLogin = useCallback(async (identitySource: string, args: EMAIL_LOGIN_PARAM | LINE_LOGIN_PARAM) => {
     if (!inited) return
-    if (await isAuth()) return
+    if ( auth.accesstoken && auth.idToken ) return
     setBusy(true)
     if (identitySource === 'email') {
       const { email, password } = args as EMAIL_LOGIN_PARAM
@@ -101,7 +96,7 @@ export const AmplifyAuthProvider: React.FC<AmplifyAuthCongigure> = ({ children }
 
   const doRegister = useCallback(async (identitySource: IdentitySource, args: unknown) => {
     if (!inited) return
-    if (await isAuth()) return
+    if (auth.accessToken && auth.idToken) return
     switch(identitySource) {
       case 'email':
         const { email, password } = args as { email: string, password: string }
@@ -112,7 +107,7 @@ export const AmplifyAuthProvider: React.FC<AmplifyAuthCongigure> = ({ children }
     }
   }, [inited])
 
-  const doGetAccessToken = useCallback(async () => {
+  const getAccessToken = useCallback(async () => {
     if (!auth?.accessToken) {
       await _refreshToken()
     }
@@ -156,16 +151,15 @@ export const AmplifyAuthProvider: React.FC<AmplifyAuthCongigure> = ({ children }
 
   const value = {
     isBusy,
-    auth,
     // func
     doLogin,
     doLogout,
     doRegister,
-    isAuth,
     // for test
     accessToken: auth?.accessToken ?? null,
-    decodeIDToken: auth?.idTokenPayload ?? null,
-    doGetAccessToken,
+    idToken: auth?.idToken ?? null,
+    idTokenPayload: auth?.idTokenPayload ?? null,
+    getAccessToken,
     getIdToken,
     getDecodedIdToken,
     getProfile

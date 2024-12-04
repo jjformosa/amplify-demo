@@ -18,16 +18,16 @@ export interface LiffService extends OIDCService {
 
 export const LiffContext = createContext<LiffService>({
   inited: false,
-  auth: emptyOIDCAuth,
   doLogin: async () => {},
   doLogout: async () => {},
   doRegister: async () => {},
-  doGetAccessToken: async () => null,
+  getAccessToken: async () => null,
   getIdToken: async () => null,
   getDecodedIdToken: async () => null,
   getProfile: async () => null,
-  isAuth: async () => false,
-  accessToken: null
+  accessToken: null,
+  idToken: null,
+  idTokenPayload: null
 })
 
 export type LiffCongigure = {
@@ -47,13 +47,14 @@ export const LiffProvider: React.FC<LiffCongigure> = ({ children, liffId }) => {
   const doLogout = useCallback(async () => {
     if (!liff) return
     liff.logout()
+    setAuth(emptyOIDCAuth)
   }, [liff])
 
   const doRegister = useCallback(async () => {
     throw 'can\'t register by liff'
   }, [liff])
 
-  const doGetAccessToken = useCallback(async () => {
+  const getAccessToken = useCallback(async () => {
     if (!liff) return null
     let accessToken = auth.accessToken
     if (!accessToken) {
@@ -64,12 +65,6 @@ export const LiffProvider: React.FC<LiffCongigure> = ({ children, liffId }) => {
       })
     }
     return accessToken
-  }, [liff])
-  
-  // getter
-  const isAuth = useCallback(async () => {
-    if (!liff) return false
-    return liff.isLoggedIn()
   }, [liff])
   const getIdToken = useCallback(async () => {
     if (!liff) return null
@@ -106,7 +101,7 @@ export const LiffProvider: React.FC<LiffCongigure> = ({ children, liffId }) => {
     const update = async () => {
       if (!liff) return
       if (liff.isLoggedIn()) {
-        await doGetAccessToken()
+        await getAccessToken()
         await getIdToken()
         await getDecodedIdToken()
       }
@@ -130,16 +125,14 @@ export const LiffProvider: React.FC<LiffCongigure> = ({ children, liffId }) => {
   const value = {
     // state
     inited: (liff !== null),
-    auth,
     // func
     doLogin,
     doLogout,
     doRegister,
-    isAuth,
-    // for test
     accessToken: auth.accessToken ?? null,
-    decodeIDToken: auth.idTokenPayload ?? null,
-    doGetAccessToken,
+    idToken: auth.idToken ?? null,
+    idTokenPayload: auth.idTokenPayload ?? null,
+    getAccessToken,
     getIdToken,
     getDecodedIdToken,
     getProfile

@@ -19,22 +19,22 @@ export const Login = () => {
   useEffect(() => {
     if ($liff.isLoggedIn) {
       if (!$amplifyAuth.isLoggedIn) {
-      //   $navigate('/')
-      // } else {
+         $navigate('/')
+      } else {
         // TODO loading block
-        // const accesstoken = $liff.accessToken!;
-        // const idToken = $liff.idToken!;
-        Promise.all([$liff.getIdToken(), $liff.doGetAccessToken()])
-          .then(([idToken, accesstoken]) => {
-            if (!idToken || !accesstoken) throw new Error(`liff error: idToken ${idToken}, accesstoken ${accesstoken}`);
-            // $amplifyAuth.doLogin('liff', { accesstoken, idToken });
-            $amplifyAuth.doLogout().then(() => {
-              console.log('logout success')
-            });
-        }).catch(e => console.error(e)) // TODO err dialog
-      }
-    }
-  }, [$liff.isLoggedIn])
+        try {
+          const accesstoken = $liff.accessToken!;
+          const idToken = $liff.idToken!;
+          $amplifyAuth.doLogin('liff', { accesstoken, idToken });
+        } catch(e) {
+          console.error(`liff error: idToken or accesstoken is null`);
+        }
+      //   $amplifyAuth.doLogout().then(() => {
+      //     console.log('logout success')
+      //   })
+      // }
+    }}
+  }, [$liff.accessToken, $liff.idToken])
 
   if (!$liff.isLoggedIn) {
     return (
@@ -45,7 +45,7 @@ export const Login = () => {
   } else {
     return (
       <div className="p-4">
-        LoggedIn!!!!
+        Liff LoggedIn!!!!
       </div>
     );
   }

@@ -4,7 +4,6 @@ import { type OIDCService, type AmplifyAuthService, type IdentitySource, Amplify
 type LoginState = {
   inited: boolean,
   isLoggedIn: boolean,
-  accessToken: string | null,
   userName: string | null,
   userId: string | null,
   name: string | null,
@@ -17,7 +16,6 @@ export const useAmplifyAuth = (): AmplifyAuthService & LoginState => {
   const [amplifyState, setAmplifyState] = useState<LoginState>({
     inited: false,
     isLoggedIn: false,
-    accessToken: null,
     userId: null,
     userName: null,
     name: null,
@@ -25,22 +23,21 @@ export const useAmplifyAuth = (): AmplifyAuthService & LoginState => {
     picture: null
   })
   const context = useContext(AmplifyAuthContext)
+
   const update = useCallback(async () => {
-    const isLoggedIn = context.auth?.accessToken !== null
-    const accessToken = context.auth?.accessToken ?? null
-    const decodedIdToken = context.auth?.idTokenPayload ?? null
+    const isLoggedIn = (context.accessToken !== null) && (context.idToken !== null)
+    const decodedIdToken = context.idTokenPayload ?? null
     const profile = await context.getProfile()
     setAmplifyState({
       inited: true,
       isLoggedIn,
-      accessToken,
       userId: profile?.userId ?? null,
       userName: profile?.username ?? null,
       name: decodedIdToken?.name ?? null,
       email: decodedIdToken?.email ?? null,
       picture: (decodedIdToken?.picture as string) ?? null
     })
-  }, [context.auth])
+  }, [context.accessToken, context.idToken])
   useEffect(() => {
     update()
   }, [context.accessToken])

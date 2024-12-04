@@ -8,10 +8,10 @@ export interface AuthService {
 }
 
 export interface OIDCService extends AuthService {
-  auth: OIDCAuth | null;
-  isAuth: () => Promise<boolean>;
   readonly accessToken: string | null;
-  doGetAccessToken(): Promise<OIDCAuth['accessToken'] | null>;
-  getIdToken(): Promise<string | null>;
-  getDecodedIdToken(): Promise<OIDCIdToken | null>;
+  readonly idToken: string | null;
+  readonly idTokenPayload: OIDCIdToken | null;
+  private getAccessToken(): Promise<OIDCAuth['accessToken'] | null>;
+  private getIdToken(): Promise<string | null>;
+  private getDecodedIdToken(): Promise<OIDCIdToken | null>;
 }

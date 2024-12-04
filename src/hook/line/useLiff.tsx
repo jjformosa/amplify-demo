@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useCallback } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { LiffContext, type OIDCService } from '@src/context/LiffContext'
 
 export type LoginState = {
@@ -23,65 +23,31 @@ export const useLiff = (): OIDCService & LoginState => {
   })
   const context = useContext(LiffContext)
 
-  const updateAuth = useCallback(async () => {
-    const isLoggedIn = await context.isAuth()
-    const accessToken = context.auth?.accessToken ?? null
-    const idToken = context.auth?.idToken ?? null
-    const decodedIdToken = context.auth?.idTokenPayload
+  // useEffect(() => {
+  //   const accessToken = context.accessToken ?? null
+  //   setLiffState({
+  //     ...liffState,
+  //     accessToken
+  //   })
+  // }, [context.accessToken])
+  // useEffect(() => {
+  //   const idToken = context.idToken ?? null
+  //   setLiffState({
+  //     ...liffState,
+  //     idToken
+  //   })
+  // }, [context.idToken])
+  useEffect(() => {
+    const idTokenPayload = context.idTokenPayload ?? null
+    const isLoggedIn = idTokenPayload !== null
     setLiffState({
       ...liffState,
       isLoggedIn,
-      accessToken,
-      idToken,
-      name: decodedIdToken?.name ?? null,
-      email: decodedIdToken?.email ?? null,
-      picture: (decodedIdToken?.picture as string) ?? null
+      name: idTokenPayload?.name ?? null,
+      email: idTokenPayload?.email ?? null,
+      picture: (idTokenPayload?.picture as string) ?? null
     })
-  }, [context.auth])
-
-  useEffect(() => {
-    updateAuth() // useEffect 不接受async修飾，所以如果一定要的話，乾脆把function用useCallback額外定義
-    // TODO 驗證useCallback跟直接再effect裡面定義const function的效能問題
-  }, [context.auth])
-
-  useEffect(() => {
-    const inited = context.inited
-    console.log('update', inited)
-    setLiffState({
-      ...liffState,
-      inited
-    })
-  }, [context.inited])
-
-  useEffect(() => {
-    if (context.auth?.accessToken) {
-      setLiffState({
-        ...liffState,
-        accessToken: context.auth.accessToken
-      })
-    }
-  }, [context.auth?.accessToken])
-
-  useEffect(() => {
-    if (context.auth?.idToken) {
-      setLiffState({
-        ...liffState,
-        idToken: context.auth.idToken
-      })
-    }
-  }, [context.auth?.idToken])
-
-  useEffect(() => {
-    if (context.auth?.idTokenPayload) {
-      const decodedIdToken = context.auth.idTokenPayload
-      setLiffState({
-        ...liffState,
-        name: decodedIdToken?.name ?? null,
-        email: decodedIdToken?.email ?? null,
-        picture: (decodedIdToken?.picture as string) ?? null
-      })
-    }
-  }, [context.auth?.idTokenPayload])
+  }, [context.idTokenPayload])
 
   if (context === undefined) {
     throw new Error('useLiff must be used within a LiffProvider')
