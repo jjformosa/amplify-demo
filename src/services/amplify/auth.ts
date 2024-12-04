@@ -312,7 +312,7 @@ export const getProfile = async ():Promise<GetCurrentUserOutput> => getCurrentUs
 
 export const getSession = async ():Promise<AuthSession> => fetchAuthSession()
 
-export const doRegisterByLiff = async (idToken: string, accesstoken: string): Promise<LoginResult> => {
+export const doRegisterByLiff = async (idToken: string): Promise<LoginResult> => {
   const payload = (decodeJWT(idToken).payload) as OIDCIdToken
   const { email, picture, name, sub } = payload
   if (!email || !sub) throw new Error('email is null')
@@ -333,6 +333,7 @@ export const doRegisterByLiff = async (idToken: string, accesstoken: string): Pr
     }
   }
   const { isSignUpComplete, nextStep } = await signUp(signUpParam)
+  console.log(336, isSignUpComplete, nextStep)
   return { isSignedIn: isSignUpComplete, nextStep: { signUpStep: nextStep.signUpStep } }
 }
 

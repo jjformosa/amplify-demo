@@ -147,28 +147,28 @@ return auth.accessToken //但還沒有完成變更，導致呼叫的結果依然
 ```
 
 ### 單向資料流
-或者說，flex、redux的精神，成如前面所說，如果要說個人常年的習慣，尤其是像accesstoken這種deferred/promise模式，我用方法比屬性多，但是要知道，在ReactJS，不論是Class Component的state，還是有hook的Functional Component，都必須更新屬性才能觸發變動。如果有以下程式碼
+或者說，flex、redux的精神，在ReactJS，不論是Class Component的state，還是有hook的Functional Component，都必須更新屬性才能觸發變動。如果有以下程式碼
 ```typescript
 // src/Context/liff.ts
   const doGetAccessToken = useCallback(async () => {
-    if (!liff) return null
+    if (!liff) return null //關注liff的變更，這個判斷是才有機會通過
     let accessToken = auth.accessToken
     if (!accessToken) {
       accessToken = liff.getAccessToken()
-      setAuth({
+      setAuth({           //更新auth
         ...auth,
         accessToken
       })
     }
     return accessToken
-  }, [liff])
+  }, [liff]) //關注liff
 // src/hook/liff.ts
 useEffect(() => {
     const work = async () => {
       if (await context.isAuth()) {
-        const accessToken = await context.doGetAccessToken()
-        const idToken = await context.getIdToken()
-        const decodedIdToken = await context.getDecodedIdToken()
+        const accessToken = await context.auth.accessToken
+        const idToken = await context.auth.idToken
+        const decodedIdToken = await context.auth.idTokenPayload
         setLiffState({
           ...liffState,
           isLoggedIn: true,
@@ -183,7 +183,7 @@ useEffect(() => {
     if (context.inited) {
       work()
     }
-  }, [context.inited])
+  }, [context.inited, context.auth])  //關注inited和auth
 ```
 也可以分離關注點
 ```typescript
@@ -218,7 +218,7 @@ useEffect(() => {
     }
   }, [context.auth?.idTokenPayload])
 ```
-把一個流程串起來看
+在面對資料流的時候，我們需要先想像流程
 ```javascript
 // MainPage
 onLoginBtnClick(hook.doLogin())
@@ -267,6 +267,6 @@ if (authContext.isLoggedIn()) {
 ```
 最大的不同應該在React的各部分元件，只透過hook或者context，關注它們需要反應的資料 vs 傳統的Page需要持有並認識所有的子/父甚至兄弟元件，在更新資料後一個個assign新的值。我知道也有框架用IoC等模式去優化這個問題，雙向綁定也很好，就只是ReactJS採取了單向資料流而已，模式沒甚麼絕對的優劣，熟悉它的特性就好。比如說到pub/sub，單向資料流一定比IoC或雙向綁定的框架更適合，但如果遇到一定要pub/sub的場景，它們也一定有解決方案。
 
-> 需求其實跟技術選型息息相關，真的不要怪工程師:「早說，你為何不早說」
+> 需求其實跟技術選型息息相關，工程師:「早說，你為何不早說」
 
 [^1]:[事件風暴-領域建模](https://www.slideshare.net/slideshow/ss-125442613/125442613#40)

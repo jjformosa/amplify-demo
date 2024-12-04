@@ -19,8 +19,6 @@ export const Login = () => {
   useEffect(() => {
     if ($liff.isLoggedIn) {
       if (!$amplifyAuth.isLoggedIn) {
-         $navigate('/')
-      } else {
         // TODO loading block
         try {
           const accesstoken = $liff.accessToken!;
@@ -34,7 +32,7 @@ export const Login = () => {
       //   })
       // }
     }}
-  }, [$liff.accessToken, $liff.idToken])
+  }, [$liff.isLoggedIn])
 
   if (!$liff.isLoggedIn) {
     return (

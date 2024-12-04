@@ -11,7 +11,7 @@ export type LoginState = {
   picture: string | null
 }
 
-export const useLiff = (): OIDCService & LoginState => {
+export const useLiff = (): Omit<OIDCService, "auth"> & LoginState => {
   const [liffState, setLiffState] = useState<LoginState>({
     inited: false,
     isLoggedIn: false,
@@ -22,32 +22,21 @@ export const useLiff = (): OIDCService & LoginState => {
     picture: null
   })
   const context = useContext(LiffContext)
-
-  // useEffect(() => {
-  //   const accessToken = context.accessToken ?? null
-  //   setLiffState({
-  //     ...liffState,
-  //     accessToken
-  //   })
-  // }, [context.accessToken])
-  // useEffect(() => {
-  //   const idToken = context.idToken ?? null
-  //   setLiffState({
-  //     ...liffState,
-  //     idToken
-  //   })
-  // }, [context.idToken])
   useEffect(() => {
+    const accessToken = context.auth.accessToken ?? null
+    const idToken = context.auth.idToken ?? null
     const idTokenPayload = context.idTokenPayload ?? null
     const isLoggedIn = idTokenPayload !== null
     setLiffState({
       ...liffState,
       isLoggedIn,
+      accessToken,
+      idToken,
       name: idTokenPayload?.name ?? null,
       email: idTokenPayload?.email ?? null,
       picture: (idTokenPayload?.picture as string) ?? null
     })
-  }, [context.idTokenPayload])
+  }, [context.auth])
 
   if (context === undefined) {
     throw new Error('useLiff must be used within a LiffProvider')

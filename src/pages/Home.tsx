@@ -13,10 +13,11 @@ export const Home = () => {
   const $amplifyAuth = useAmplifyAuth();
 
   const _loginWithLiff = useCallback(async () => {
-    const accesstoken = await $liff.doGetAccessToken()
-    const idToken = await $liff.getIdToken()
-    if(!idToken || !accesstoken) return
-    await $amplifyAuth.doLogin('liff', { accesstoken, idToken })
+    if ($liff.isLoggedIn && !$amplifyAuth.isLoggedIn) {
+      const accesstoken = $liff.accessToken!;
+      const idToken = $liff.idToken!;
+      await $amplifyAuth.doLogin('liff', { accesstoken, idToken })
+    }
   }, [$liff.isLoggedIn])
 
   useEffect(() => {
@@ -49,26 +50,26 @@ export const Home = () => {
     client.models.Todo.create({ content: window.prompt("Todo content") });
   }
 
-  if (!$liff.isLoggedIn) {
+  if ($amplifyAuth.isLoggedIn) {
     return (
-      <div>TODO 載入中</div>
+      <>
+        <h1>My todos</h1>
+        <button onClick={createTodo}>+ new</button>
+        <ul>
+          {todos.map((todo) => (
+            <li key={todo.id}>{todo.content}</li>
+          ))}
+        </ul>
+        <div>
+          🥳 App successfully hosted. Try creating a new todo.
+          <br />
+          <a href="https://docs.amplify.aws/react/start/quickstart/#make-frontend-updates">
+            Review next step of this tutorial.
+          </a>
+        </div>
+      </>
     );
   } else {
-    <>
-      <h1>My todos</h1>
-      <button onClick={createTodo}>+ new</button>
-      <ul>
-        {todos.map((todo) => (
-          <li key={todo.id}>{todo.content}</li>
-        ))}
-      </ul>
-      <div>
-        🥳 App successfully hosted. Try creating a new todo.
-        <br />
-        <a href="https://docs.amplify.aws/react/start/quickstart/#make-frontend-updates">
-          Review next step of this tutorial.
-        </a>
-      </div>
-    </>
+    <div>TODO 載入中</div>
   }
 };

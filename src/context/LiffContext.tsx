@@ -10,6 +10,7 @@ export type { OIDCService, OIDCAuth, Liff, LiffProfile }
 
 export interface LiffService extends OIDCService {
   inited: boolean;
+  auth: OIDCAuth,
   doLogin: (redirectURL?: string ) => Promise<void>;
   doLogout: () => Promise<void>;
   doRegister: (redirectURL?: string) => Promise<void>;
@@ -18,6 +19,7 @@ export interface LiffService extends OIDCService {
 
 export const LiffContext = createContext<LiffService>({
   inited: false,
+  auth: emptyOIDCAuth,
   doLogin: async () => {},
   doLogout: async () => {},
   doRegister: async () => {},
@@ -54,43 +56,45 @@ export const LiffProvider: React.FC<LiffCongigure> = ({ children, liffId }) => {
     throw 'can\'t register by liff'
   }, [liff])
 
+  const _refreshToken = useCallback(async () => {
+    if (!liff) return
+    const accessToken = liff.getAccessToken()
+    const idToken = liff.getIDToken()
+    const result = await liff.getDecodedIDToken()
+    const idTokenPayload = result ? { ...result } : null
+    setAuth({
+      ...auth,
+      accessToken,
+      idToken,
+      idTokenPayload
+    })
+  }, [liff])
+
   const getAccessToken = useCallback(async () => {
     if (!liff) return null
     let accessToken = auth.accessToken
     if (!accessToken) {
       accessToken = liff.getAccessToken()
-      setAuth({
-        ...auth,
-        accessToken
-      })
     }
     return accessToken
-  }, [liff])
+  }, [liff, auth])
   const getIdToken = useCallback(async () => {
     if (!liff) return null
     let idToken = liff.getIDToken()
     if (!idToken) {
       idToken = liff.getIDToken()
-      setAuth({
-        ...auth,
-        idToken
-      })
     }
     return idToken
-  }, [liff])
+  }, [liff, auth])
   const getDecodedIdToken = useCallback(async () => {
     if (!liff) return null
     let idTokenPayload = auth.idTokenPayload 
     if (!idTokenPayload) {
       const result = await liff.getDecodedIDToken()
       idTokenPayload = result ? { ...result } : null
-      setAuth({
-        ...auth,
-        idTokenPayload
-      })
     }
     return idTokenPayload
-  }, [liff])
+  }, [liff, auth])
   const getProfile = useCallback(async () => {
     if (!liff) return null
     const profile = await liff.getProfile()
@@ -101,9 +105,7 @@ export const LiffProvider: React.FC<LiffCongigure> = ({ children, liffId }) => {
     const update = async () => {
       if (!liff) return
       if (liff.isLoggedIn()) {
-        await getAccessToken()
-        await getIdToken()
-        await getDecodedIdToken()
+        await _refreshToken()
       }
     }
     update()
@@ -125,13 +127,14 @@ export const LiffProvider: React.FC<LiffCongigure> = ({ children, liffId }) => {
   const value = {
     // state
     inited: (liff !== null),
+    auth,
     // func
     doLogin,
     doLogout,
     doRegister,
-    accessToken: auth.accessToken ?? null,
-    idToken: auth.idToken ?? null,
-    idTokenPayload: auth.idTokenPayload ?? null,
+    accessToken: auth.accessToken,
+    idToken: auth.idToken,
+    idTokenPayload: auth.idTokenPayload,
     getAccessToken,
     getIdToken,
     getDecodedIdToken,

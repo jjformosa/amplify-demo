@@ -72,7 +72,9 @@ export const AmplifyAuthProvider: React.FC<AmplifyAuthCongigure> = ({ children }
       const { accesstoken, idToken } = args as LINE_LOGIN_PARAM
       const { isSignedIn } = await AwsAuth.doLoginWithLiff(accesstoken, idToken)
       if (!isSignedIn) {
-        await AwsAuth.doRegisterByLiff(idToken, accesstoken)
+        await AwsAuth.doRegisterByLiff(idToken)
+      } else {
+        await _refreshToken()
       }
     }
     setBusy(false)
