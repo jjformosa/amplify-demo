@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useCallback, useMemo }  from "react"
+import React, { createContext, useState, useEffect, useCallback }  from "react"
 import { type OIDCService } from "@src/types/authService"
 import { type OIDCAuth } from "@src/types/oidc"
 import { emptyOIDCAuth } from "@src/consts/oidc"
@@ -45,7 +45,7 @@ export const LiffProvider: React.FC<LiffCongigure> = ({ children, liffId }) => {
   }, [liff])
 
   const doLogout = useCallback(async () => {
-    if (!liff) return
+    if (!liff || !liff.isLoggedIn()) return
     liff.logout()
     setAuth(emptyOIDCAuth)
   }, [liff])
