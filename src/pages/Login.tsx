@@ -36,9 +36,17 @@ export const Login = () => {
     }
   }, [$liff.isLoggedIn])
 
-  return (
-    <div className="p-4">
-      <LineLoginBtn redirectUri = {$currentUrl.host}></LineLoginBtn>
-    </div>
-  );
+  if (!$liff.isLoggedIn) {
+    return (
+      <div className="p-4">
+        <LineLoginBtn redirectUri = {$currentUrl.host}></LineLoginBtn>
+      </div>
+    );
+  } else {
+    return (
+      <div className="p-4">
+        LoggedIn!!!!
+      </div>
+    );
+  }
 };

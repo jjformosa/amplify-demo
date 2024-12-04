@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useCallback }  from "react"
+import React, { createContext, useState, useEffect, useCallback, useMemo }  from "react"
 import { type OIDCService } from "@src/types/authService"
 import { type OIDCAuth } from "@src/types/oidc"
 import { emptyOIDCAuth } from "@src/consts/oidc"
@@ -39,30 +39,22 @@ export const LiffProvider: React.FC<LiffCongigure> = ({ children, liffId }) => {
   const [liff, setLiff] = useState<Liff|null>(null)
   const [auth, setAuth] = useState<OIDCAuth>(emptyOIDCAuth)
   // func
-  const doLogin = async (redirectURL?: string|undefined) => {
+  const doLogin = useCallback(async (redirectURL?: string|undefined) => {
     if (!liff) return
     liff.login({ redirectUri: redirectURL })
-  }
+  }, [liff])
 
-  const doLogout = async () => {
+  const doLogout = useCallback(async () => {
     if (!liff) return
     liff.logout()
-  }
+  }, [liff])
 
-  const doRegister = async () => {
+  const doRegister = useCallback(async () => {
     throw 'can\'t register by liff'
-  }
+  }, [liff])
 
   const doGetAccessToken = useCallback(async () => {
     if (!liff) return null
-    // if (!auth.accessToken) {
-    //   const accessToken = liff.getAccessToken()
-    //   setAuth({
-    //     ...auth,
-    //     accessToken
-    //   })
-    // }
-    // return auth.accessToken 
     let accessToken = auth.accessToken
     if (!accessToken) {
       accessToken = liff.getAccessToken()
@@ -75,11 +67,11 @@ export const LiffProvider: React.FC<LiffCongigure> = ({ children, liffId }) => {
   }, [liff])
   
   // getter
-  const isAuth =  useCallback(async () => {
+  const isAuth = useCallback(async () => {
     if (!liff) return false
     return liff.isLoggedIn()
   }, [liff])
-  const getIdToken =  useCallback(async () => {
+  const getIdToken = useCallback(async () => {
     if (!liff) return null
     let idToken = liff.getIDToken()
     if (!idToken) {
@@ -109,21 +101,14 @@ export const LiffProvider: React.FC<LiffCongigure> = ({ children, liffId }) => {
     const profile = await liff.getProfile()
     return profile ? { name: profile.displayName, userId: profile.userId, picture: profile.pictureUrl } : null
   }, [liff])
-
   useEffect(() => {
     console.log('useEffect of Liff', liff)
     const update = async () => {
       if (!liff) return
       if (liff.isLoggedIn()) {
-        const accessToken = await liff.getAccessToken()
-        const idToken = liff.getIDToken()
-        const idTokenPayload = await liff.getDecodedIDToken()
-        setAuth({
-          ...auth,
-          accessToken,
-          idToken,
-          idTokenPayload: idTokenPayload ? { ...idTokenPayload } : null
-        })
+        await doGetAccessToken()
+        await getIdToken()
+        await getDecodedIdToken()
       }
     }
     update()

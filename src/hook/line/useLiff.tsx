@@ -53,6 +53,36 @@ export const useLiff = (): OIDCService & LoginState => {
     })
   }, [context.inited])
 
+  useEffect(() => {
+    if (context.auth?.accessToken) {
+      setLiffState({
+        ...liffState,
+        accessToken: context.auth.accessToken
+      })
+    }
+  }, [context.auth?.accessToken])
+
+  useEffect(() => {
+    if (context.auth?.idToken) {
+      setLiffState({
+        ...liffState,
+        idToken: context.auth.idToken
+      })
+    }
+  }, [context.auth?.idToken])
+
+  useEffect(() => {
+    if (context.auth?.idTokenPayload) {
+      const decodedIdToken = context.auth.idTokenPayload
+      setLiffState({
+        ...liffState,
+        name: decodedIdToken?.name ?? null,
+        email: decodedIdToken?.email ?? null,
+        picture: (decodedIdToken?.picture as string) ?? null
+      })
+    }
+  }, [context.auth?.idTokenPayload])
+
   if (context === undefined) {
     throw new Error('useLiff must be used within a LiffProvider')
   }
