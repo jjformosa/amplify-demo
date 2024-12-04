@@ -40,7 +40,8 @@ export const auth = defineAuth({
     verifyAuthChallengeResponse,
     preSignUp,
     postConfirmation
-  }
+  },
+  groups: ['admin']
 });
 
 // if use exist Auth
