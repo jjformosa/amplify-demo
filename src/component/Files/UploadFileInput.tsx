@@ -3,7 +3,6 @@ import { uploadData } from 'aws-amplify/storage';
 
 export type UploadFileInputParam = {
     directName: 'public' | 'personal' | 'private';
-    uId: string;
 } 
 
 export const UploadFileInput = ({ directName } : UploadFileInputParam) => {
@@ -18,7 +17,7 @@ export const UploadFileInput = ({ directName } : UploadFileInputParam) => {
       return;
     }
     uploadData({
-      path: () => `${directName}/1234/${file.name}`,
+      path: ({ identityId }) => `${directName}/${identityId}/${file.name}`,
       options: {
         bucket: 'secondBucket'
       },

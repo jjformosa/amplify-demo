@@ -7,11 +7,11 @@ export const FileList = ({ directName }: UploadFileInputParam) => {
 
   React.useEffect(() => {
     const input: ListAllWithPathInput = {
-      path: (params) => {
-        console.log(params)
-        const path = `${directName}/1234`;
+      path: ({ identityId }) => {
+        const path = `${directName}/${identityId}`;
+        console.log(path);
         return path;
-      },
+      }
     };
     list(input).then((result: ListAllWithPathOutput) => {
       setFiles(result.items);

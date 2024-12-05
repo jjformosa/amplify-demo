@@ -40,8 +40,8 @@ export const FilesPage = () => {
   if ($amplifyAuth.isLoggedIn) {
     return (
       <>
-        <UploadFileInput directName="personal" uId={$amplifyAuth.userName!}  />
-        <FileList directName="personal" uId={$amplifyAuth.userName!} />
+        <UploadFileInput directName="private" />
+        <FileList directName="private" />
       </>
     );
   }
