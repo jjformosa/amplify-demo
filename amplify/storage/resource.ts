@@ -28,7 +28,7 @@ export const secondBucket = defineStorage({
       allow.entity('identity').to(['read', 'write', 'delete']),
       allow.authenticated.to(['read'])
     ],
-    'public':[
+    'public/*':[
       allow.authenticated.to(['read'])
     ]
   })
