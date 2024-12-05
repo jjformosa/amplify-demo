@@ -20,7 +20,7 @@ export type SignUpInputWithLiff = {
   accesstoken: string
 }
 
-export const verifyIdTokenWithLiff = async function (id_token: string, client_info: { email: String }): Promise<boolean> {
+export const verifyIdTokenWithLiff = async function (id_token: string, client_info: { email: string }): Promise<boolean> {
   const client_id = process.env.LIFF_CLIENT_ID
   const liffSecrect = process.env.LIFF_CLIENT_SECRECT
   console.log(`liff param: ${client_id}, ${liffSecrect}`)

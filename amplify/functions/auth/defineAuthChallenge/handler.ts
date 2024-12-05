@@ -1,8 +1,4 @@
 import { type DefineAuthChallengeTriggerHandler } from 'aws-lambda'
-import AWS from 'aws-sdk'
-import { printEachOfStringMap } from '../utils'
-
-const cognitClient = new AWS.CognitoIdentityServiceProvider()
 
 export const handler: DefineAuthChallengeTriggerHandler = async (event) => {
   event.response.issueTokens = false

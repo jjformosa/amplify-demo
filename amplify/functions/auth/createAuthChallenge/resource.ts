@@ -1,4 +1,4 @@
-import { defineFunction, secret } from "@aws-amplify/backend";
+import { defineFunction } from "@aws-amplify/backend";
 
 const createAuthChallenge = defineFunction({
   name: 'create-auth-challenge'

@@ -1,9 +1,9 @@
 import { OIDCIdToken, type OIDCAuth } from "./oidc"
 
 export interface AuthService {
-  doLogin: ( ...args: any[]) => Promise<unknown>;
+  doLogin: ( ...args: unknown[]) => Promise<unknown>;
   doLogout: () => Promise<void>;
-  doRegister: (...args: any[]) => Promise<unknown>;
+  doRegister: (...args: unknown[]) => Promise<unknown>;
   getProfile: () => Promise<unknown>;
 }
 
