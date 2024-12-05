@@ -19,6 +19,9 @@ export const UploadFileInput = ({ directName } : UploadFileInputParam) => {
     }
     uploadData({
       path: () => `${directName}/1234/${file.name}`,
+      options: {
+        bucket: 'secondBucket'
+      },
       data: file,
     })
   }, [file, directName])
