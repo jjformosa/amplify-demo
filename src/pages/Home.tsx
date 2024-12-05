@@ -4,6 +4,7 @@ import { generateClient } from "aws-amplify/data";
 import { useLiff } from "@src/hook/line/useLiff";
 import { useAmplifyAuth } from "@src/hook/amplify";
 import { useNavigate } from 'react-router-dom';
+import { v4 } from 'uuid';
 
 const client = generateClient<Schema>();
 export const Home = () => {
@@ -11,6 +12,41 @@ export const Home = () => {
   const $navigate = useNavigate();
   const $liff = useLiff();
   const $amplifyAuth = useAmplifyAuth();
+
+  // [Day9]
+  const refreshTodo = useCallback(() => {
+    client.models.Todo.sortByCreatedAt({  // you replace it to models.Todo.list method, and see what will happend after createTodo several times
+      author: $amplifyAuth.userName!
+    }).then(({ data, nextToken }) => {
+      setTodos([...data])
+      if (nextToken) {  // it would be very helpfully, if you want to work with Infinite Scroll.
+        console.log('nextToken', nextToken)
+      }
+    })
+    .catch((err) => console.error(err))
+  }, [$amplifyAuth.userName])
+  
+  // [Day9]
+  const createTodo = useCallback(() => {
+    if (!$amplifyAuth.userId) throw new Error('not login');
+    const id = v4();
+    const now = new Date().toISOString();
+    const author = $amplifyAuth.userId;
+    const authorName = $amplifyAuth.userName;
+    const content = window.prompt("Todo content");
+    const done = false;
+    client.models.Todo.create({
+      id,
+      createdAt: now,
+      updatedAt: now,
+      author,
+      authorName,
+      done,
+      content,
+    }).then(() => {
+      refreshTodo()
+     });
+  }, [$amplifyAuth.userId])
 
   const _loginWithLiff = useCallback(async () => {
     if ($liff.isLoggedIn && !$amplifyAuth.isLoggedIn) {
@@ -31,13 +67,16 @@ export const Home = () => {
   }, [$amplifyAuth.accessToken])
 
   useEffect(() => {
-    client.models.Todo.observeQuery().subscribe({
-      next: (data) => setTodos([...data.items]),
-    });
-  }, []);
+    // client.models.Todo.observeQuery().subscribe({
+    //   next: (data) => setTodos([...data.items]),
+    // });
+    // [Day9] sample, but you can figure out that observe maybe the more useful method.
+    if ($amplifyAuth.isLoggedIn) {
+      refreshTodo()
+    }
+  }, [$amplifyAuth.isLoggedIn]);
   useEffect(() => {
     if(!$liff.inited) return
-    console.log('aaa')
     if(!$liff.isLoggedIn) {
       $navigate('/login')
     } else {
@@ -45,10 +84,6 @@ export const Home = () => {
       // $liff.doLogout()
     }
   }, [$liff.inited, $liff.isLoggedIn])
-
-  function createTodo() {
-    client.models.Todo.create({ content: window.prompt("Todo content") });
-  }
 
   if ($amplifyAuth.isLoggedIn) {
     return (
