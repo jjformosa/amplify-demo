@@ -3,13 +3,12 @@ import { list, type ListAllWithPathOutput, type ListAllWithPathInput } from 'aws
 import { type UploadFileInputParam } from './UploadFileInput';
 
 export const FileList = ({ directName }: UploadFileInputParam) => {
-  const [files, setFiles] = React.useState<any[]>([]);
+  const [files, setFiles] = React.useState<{ path: string }[]>([]);
 
   React.useEffect(() => {
     const input: ListAllWithPathInput = {
       path: ({ identityId }) => {
         const path = `${directName}/${identityId}`;
-        console.log(path);
         return path;
       }
     };

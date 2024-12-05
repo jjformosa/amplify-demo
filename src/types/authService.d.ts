@@ -11,7 +11,7 @@ export interface OIDCService extends AuthService {
   readonly accessToken: string | null;
   readonly idToken: string | null;
   readonly idTokenPayload: OIDCIdToken | null;
-  private getAccessToken(): Promise<OIDCAuth['accessToken'] | null>;
-  private getIdToken(): Promise<string | null>;
-  private getDecodedIdToken(): Promise<OIDCIdToken | null>;
+  getAccessToken(): Promise<OIDCAuth['accessToken'] | null>;
+  getIdToken(): Promise<string | null>;
+  getDecodedIdToken(): Promise<OIDCIdToken | null>;
 }

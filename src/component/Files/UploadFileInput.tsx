@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { ChangeEvent, useCallback } from 'react';
 import { uploadData } from 'aws-amplify/storage';
 
 export type UploadFileInputParam = {
@@ -8,8 +8,12 @@ export type UploadFileInputParam = {
 export const UploadFileInput = ({ directName } : UploadFileInputParam) => {
   const [file, setFile] = React.useState<File|null>(null);
 
-  const handleChange = (event: any) => {
-    setFile(event.target.files[0]);
+  const handleChange = (event: ChangeEvent) => {
+    const target = event.target as HTMLInputElement;
+    if (!target.files) {
+      return;
+    }
+    setFile(target.files[0]);
   };
 
   const onUploadFileClick = useCallback(() => {
