@@ -1,21 +1,23 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Schema } from "../../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
+import { type V6Client } from '@aws-amplify/api-graphql'
 import { useLiff } from "@src/hook/line/useLiff";
 import { useAmplifyAuth } from "@src/hook/amplify";
 import { useNavigate } from 'react-router-dom';
 import { v4 } from 'uuid';
 
-const client = generateClient<Schema>();
+// let client: any = null;
 export const Home = () => {
   const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
+  const [client, setClient] = useState<V6Client<Schema>|null>();
   const $navigate = useNavigate();
   const $liff = useLiff();
   const $amplifyAuth = useAmplifyAuth();
 
   // [Day9]
   const refreshTodo = useCallback(() => {
-    client.models.Todo.sortByCreatedAt({  // you replace it to models.Todo.list method, and see what will happend after createTodo several times
+    client!.models.Todo.sortByCreatedAt({  // you replace it to models.Todo.list method, and see what will happend after createTodo several times
       author: $amplifyAuth.userName!
     }).then(({ data, nextToken }) => {
       setTodos([...data])
@@ -24,18 +26,18 @@ export const Home = () => {
       }
     })
     .catch((err) => console.error(err))
-  }, [$amplifyAuth.userName])
+  }, [client])
   
   // [Day9]
   const createTodo = useCallback(() => {
-    if (!$amplifyAuth.userId) throw new Error('not login');
+    if (!$amplifyAuth.userId || !client) throw new Error('not login');
     const id = v4();
     const now = new Date().toISOString();
     const author = $amplifyAuth.userId;
     const authorName = $amplifyAuth.userName;
     const content = window.prompt("Todo content");
     const done = false;
-    client.models.Todo.create({
+    client!.models.Todo.create({
       id,
       createdAt: now,
       updatedAt: now,
@@ -46,7 +48,7 @@ export const Home = () => {
     }).then(() => {
       refreshTodo()
      });
-  }, [$amplifyAuth.userId])
+  }, [client])
 
   const _loginWithLiff = useCallback(async () => {
     if ($liff.isLoggedIn && !$amplifyAuth.isLoggedIn) {
@@ -72,7 +74,11 @@ export const Home = () => {
     // });
     // [Day9] sample, but you can figure out that observe maybe the more useful method.
     if ($amplifyAuth.isLoggedIn) {
-      refreshTodo()
+      const client = generateClient<Schema>({
+        authMode: "userPool",
+        authToken: $amplifyAuth.accessToken!
+      });
+      setClient(client)
     }
   }, [$amplifyAuth.isLoggedIn]);
   useEffect(() => {
