@@ -75,3 +75,4 @@ const schema = a.schema({
 2. 可以依照建立日期搜尋自己開的TODO清單
 
 [^1]:[DyanmoDB的Secondary Index設計](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.html)，實際上是NoSQL(Document)資料如果要整合多張表，怎麼設計，大致都在這篇文中了
+[^2]:[找到一篇中文的整理](https://rickhw.github.io/2016/08/17/AWS/Study-Notes-DynamoDB/)，至少排版看起來就很專業
