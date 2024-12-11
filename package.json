@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "mkdir ./dist && cp ./public/helloworld.html ./dist/index.html && tsc",
+    "build": "mkdir ./dist && cp ./public/helloworld.html ./dist/index.html",
     "build:frontend": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"

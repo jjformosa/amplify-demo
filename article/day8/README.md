@@ -148,3 +148,9 @@ def get_shared_files():
     )
     return shared_files
 ```
+
+### 24/12/11 採坑紀錄
+1. 在vue版本需要自行定義一個global變數給storage lib使用，錯誤訊息是global is not defined，google結果就有多種情境受害，memo一些狀況在底下[^1]
+2. 不論透過哪個sdk，amplify也好，js也好，python也好(boto3)，都要自己處理ContentType，避免在網頁行為異常。
+
+[^1]https://stackoverflow.com/questions/75613976/how-do-i-resolve-global-is-not-defined-issue-using-cognito-and-vue3、https://stackoverflow.com/questions/75613976/how-do-i-resolve-global-is-not-defined-issue-using-cognito-and-vue3
